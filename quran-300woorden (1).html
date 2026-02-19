@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quran 300 woorden</title>
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React 18 (UMD) + Babel for in-browser JSX transform -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
+
+
+const WORDS = [
+{id:1,ar:"ذَٰلِكَ",tr:"dhālika",gram:"Aanwijzend vnw. (mann. – ver)",trans:"Dat",mean:"Verwijst naar iets ver weg",exar:"ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ",exnl:"Dat is het Boek, zonder twijfel."},
+{id:2,ar:"الَّذِي",tr:"alladhī",gram:"Betrekkelijk vnw. (mann.)",trans:"Die / degene die",mean:"Verbindt zinnen naar persoon/zaak",exar:"اللَّهُ الَّذِي خَلَقَكُمْ",exnl:"Allah is Degene die jullie schiep."},
+{id:3,ar:"هَٰذَا",tr:"hādhā",gram:"Aanwijzend vnw. (mann. – nabij)",trans:"Dit",mean:"Geeft iets dichtbij aan",exar:"هَٰذَا صِرَاطٌ مُسْتَقِيمٌ",exnl:"Dit is een recht pad."},
+{id:4,ar:"هُوَ",tr:"huwa",gram:"Persoonlijk vnw. (3e pers. mann.)",trans:"Hij / het",mean:"Hij, het",exar:"هُوَ اللَّهُ أَحَدٌ",exnl:"Hij is Allah, de Enige."},
+{id:5,ar:"هِيَ",tr:"hiya",gram:"Persoonlijk vnw. (3e pers. vr.)",trans:"Zij",mean:"Zij",exar:"هِيَ سَلَامٌ حَتَّى مَطْلَعِ الْفَجْرِ",exnl:"Zij is vrede tot het aanbreken van de dageraad."},
+{id:6,ar:"هُمْ",tr:"hum",gram:"Persoonlijk vnw. (3e pers. mv.)",trans:"Zij (mv.)",mean:"Zij (meerdere personen)",exar:"وَهُمْ فِيهَا خَالِدُونَ",exnl:"En zij zullen daarin eeuwig verblijven."},
+{id:7,ar:"أَنْتَ",tr:"anta",gram:"Persoonlijk vnw. (2e pers. mann.)",trans:"Jij",mean:"Jij (mannelijk)",exar:"إِنَّكَ أَنْتَ الْعَلِيمُ الْحَكِيمُ",exnl:"Voorwaar, U bent de Alwetende, de Alwijze."},
+{id:8,ar:"أَنَا",tr:"anā",gram:"Persoonlijk vnw. (1e pers.)",trans:"Ik",mean:"Ik",exar:"إِنَّنِي أَنَا اللَّهُ",exnl:"Voorwaar, Ik ben Allah."},
+{id:9,ar:"نَحْنُ",tr:"naḥnu",gram:"Persoonlijk vnw. (1e pers. mv.)",trans:"Wij",mean:"Wij",exar:"إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ",exnl:"Voorwaar, Wij zijn het die de vermaning neerzonden."},
+{id:10,ar:"تِلْكَ",tr:"tilka",gram:"Aanwijzend vnw. (vr. – ver)",trans:"Dat (vr.)",mean:"Verwijst naar iets ver weg (vrouwelijk)",exar:"تِلْكَ آيَاتُ الْكِتَابِ الْمُبِينِ",exnl:"Dat zijn de tekenen van het duidelijke Boek."},
+{id:11,ar:"مِنْ",tr:"min",gram:"Voorzetsel",trans:"Van / uit",mean:"Van, uit, onder",exar:"وَمِنَ النَّاسِ مَنْ يَقُولُ",exnl:"En onder de mensen zijn er die zeggen."},
+{id:12,ar:"إِلَى",tr:"ilā",gram:"Voorzetsel",trans:"Naar / tot",mean:"Naar, tot",exar:"إِنَّا إِلَى اللَّهِ رَاجِعُونَ",exnl:"Wij keren terug naar Allah."},
+{id:13,ar:"عَلَى",tr:"ʿalā",gram:"Voorzetsel",trans:"Op / over",mean:"Op, over, boven",exar:"وَعَلَى اللَّهِ فَتَوَكَّلُوا",exnl:"Vertrouw op Allah."},
+{id:14,ar:"فِي",tr:"fī",gram:"Voorzetsel",trans:"In",mean:"In, binnen",exar:"فِي قُلُوبِهِمْ مَرَضٌ",exnl:"In hun harten is een ziekte."},
+{id:15,ar:"عَنْ",tr:"ʿan",gram:"Voorzetsel",trans:"Over / van",mean:"Van, over, weg van",exar:"اللَّهُ عَنْهُمْ رَضِيَ",exnl:"Allah is tevreden over hen."},
+{id:16,ar:"مَعَ",tr:"maʿa",gram:"Voorzetsel",trans:"Met",mean:"Met, samen met",exar:"إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",exnl:"Allah is met de geduldigen."},
+{id:17,ar:"بِ",tr:"bi",gram:"Voorzetsel",trans:"Met / door / bij",mean:"Met, door middel van, bij",exar:"بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",exnl:"In de naam van Allah, de Erbarmer, de Barmhartige."},
+{id:18,ar:"لِ",tr:"li",gram:"Voorzetsel",trans:"Voor / aan",mean:"Voor, van, aan",exar:"لِلَّهِ مَا فِي السَّمَاوَاتِ",exnl:"Aan Allah behoort wat in de hemelen is."},
+{id:19,ar:"كَ",tr:"ka",gram:"Voorzetsel",trans:"Zoals / als",mean:"Zoals, als",exar:"لَيْسَ كَمِثْلِهِ شَيْءٌ",exnl:"Niets is zoals Hij."},
+{id:20,ar:"حَتَّى",tr:"ḥattā",gram:"Voorzetsel / voegwoord",trans:"Tot / zelfs",mean:"Tot, zodat, zelfs",exar:"حَتَّى يَأْتِيَ أَمْرُ اللَّهِ",exnl:"Totdat de zaak van Allah komt."},
+{id:21,ar:"إِنَّ",tr:"inna",gram:"Beklemtonend deeltje",trans:"Voorwaar / zeker",mean:"Benadrukt de zin die volgt",exar:"إِنَّ اللَّهَ غَفُورٌ رَحِيمٌ",exnl:"Voorwaar, Allah is Vergevensgezind, Barmhartig."},
+{id:22,ar:"لَا",tr:"lā",gram:"Ontkenningsdeeltje",trans:"Niet / nee",mean:"Ontkent wat volgt",exar:"لَا إِلَٰهَ إِلَّا اللَّهُ",exnl:"Er is geen god dan Allah."},
+{id:23,ar:"مَا",tr:"mā",gram:"Ontkenning / vraagwoord",trans:"Niet / wat",mean:"Niet / wat",exar:"مَا شَاءَ اللَّهُ",exnl:"Wat Allah heeft gewild."},
+{id:24,ar:"وَ",tr:"wa",gram:"Voegwoord",trans:"En",mean:"En",exar:"وَاللَّهُ عَلِيمٌ حَكِيمٌ",exnl:"En Allah is Alwetend, Alwijs."},
+{id:25,ar:"فَ",tr:"fa",gram:"Voegwoord",trans:"Dan / dus",mean:"Dan, dus, vervolgens",exar:"فَاتَّقُوا اللَّهَ",exnl:"Vrees Allah dan."},
+{id:26,ar:"أَوْ",tr:"aw",gram:"Voegwoord",trans:"Of",mean:"Of",exar:"أَوْ يَزِيدُ عَلَيْهِ",exnl:"Of hij vermeerdert daarboven."},
+{id:27,ar:"إِلَّا",tr:"illā",gram:"Uitzondering",trans:"Behalve / tenzij",mean:"Behalve, tenzij",exar:"لَا إِلَٰهَ إِلَّا هُوَ",exnl:"Er is geen god behalve Hij."},
+{id:28,ar:"لَمْ",tr:"lam",gram:"Ontkenningsdeeltje (verleden)",trans:"Niet (verleden)",mean:"Niet (in verleden tijd)",exar:"لَمْ يَلِدْ وَلَمْ يُولَدْ",exnl:"Hij heeft niet verwekt en is niet verwekt."},
+{id:29,ar:"لَنْ",tr:"lan",gram:"Ontkenningsdeeltje (toekomst)",trans:"Zal nooit",mean:"Zal nooit (toekomst)",exar:"لَنْ تَنَالُوا الْبِرَّ",exnl:"Jullie zullen de vroomheid nooit bereiken."},
+{id:30,ar:"قَدْ",tr:"qad",gram:"Bevestigend deeltje",trans:"Inderdaad / al",mean:"Inderdaad, al (benadrukt)",exar:"قَدْ أَفْلَحَ الْمُؤْمِنُونَ",exnl:"De gelovigen hebben inderdaad succes."},
+{id:31,ar:"إِنْ",tr:"in",gram:"Voorwaardelijk voegwoord",trans:"Als / wanneer",mean:"Als, wanneer (voorwaarde)",exar:"إِنْ كُنْتُمْ تُحِبُّونَ اللَّهَ",exnl:"Als jullie Allah liefhebben."},
+{id:32,ar:"لَوْ",tr:"law",gram:"Voorwaardelijk voegwoord",trans:"Als (onwerkelijk)",mean:"Als (irrealis, onwerkelijk)",exar:"لَوْ كَانَ فِيهِمَا آلِهَةٌ",exnl:"Als er in beiden goden waren."},
+{id:33,ar:"أَنَّ",tr:"anna",gram:"Voegwoord",trans:"Dat",mean:"Dat (bijzin)",exar:"أَنَّ اللَّهَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",exnl:"Dat Allah macht heeft over alles."},
+{id:34,ar:"أَمْ",tr:"am",gram:"Voegwoord (disjunctief)",trans:"Of (vraag)",mean:"Of (in vraagzin)",exar:"أَمْ لَمْ تُنذِرْهُمْ",exnl:"Of heb je hen niet gewaarschuwd?"},
+{id:35,ar:"بَلْ",tr:"bal",gram:"Tegenstellend deeltje",trans:"Integendeel / maar",mean:"Integendeel, maar",exar:"بَلْ هُمْ فِي شَكٍّ",exnl:"Integendeel, zij zijn in twijfel."},
+{id:36,ar:"اللَّه",tr:"Allāh",gram:"Eigennaam",trans:"Allah / God",mean:"De Enige God",exar:"بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",exnl:"In de naam van Allah, de Erbarmer, de Barmhartige."},
+{id:37,ar:"رَحْمَان",tr:"raḥmān",gram:"Bijv. nw. (intensief)",trans:"De Erbarmer",mean:"Extreem barmhartig",exar:"الرَّحْمَٰنُ عَلَّمَ الْقُرْآنَ",exnl:"De Erbarmer onderwees de Koran."},
+{id:38,ar:"رَحِيم",tr:"raḥīm",gram:"Bijvoeglijk naamwoord",trans:"De Barmhartige",mean:"Voortdurend barmhartig",exar:"وَكَانَ اللَّهُ غَفُورًا رَحِيمًا",exnl:"Allah is Vergevensgezind, Barmhartig."},
+{id:39,ar:"عَلِيم",tr:"ʿalīm",gram:"Bijvoeglijk naamwoord",trans:"Alwetend",mean:"Alwetend",exar:"وَاللَّهُ بِكُلِّ شَيْءٍ عَلِيمٌ",exnl:"Allah is alwetend over alles."},
+{id:40,ar:"حَكِيم",tr:"ḥakīm",gram:"Bijvoeglijk naamwoord",trans:"Alwijs",mean:"Alwijs",exar:"وَهُوَ الْعَزِيزُ الْحَكِيمُ",exnl:"Hij is de Almachtige, de Alwijze."},
+{id:41,ar:"قَدِير",tr:"qadīr",gram:"Bijvoeglijk naamwoord",trans:"Almachtig",mean:"Almachtig",exar:"إِنَّ اللَّهَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",exnl:"Allah heeft macht over alles."},
+{id:42,ar:"سَمِيع",tr:"samīʿ",gram:"Bijvoeglijk naamwoord",trans:"Alhorend",mean:"Alhorend",exar:"إِنَّهُ سَمِيعٌ قَرِيبٌ",exnl:"Hij is Alhorend, Nabij."},
+{id:43,ar:"بَصِير",tr:"baṣīr",gram:"Bijvoeglijk naamwoord",trans:"Alziend",mean:"Alziend",exar:"إِنَّ اللَّهَ كَانَ سَمِيعًا بَصِيرًا",exnl:"Allah is Alhorend, Alziend."},
+{id:44,ar:"غَفُور",tr:"ghafūr",gram:"Bijv. nw. (intensief)",trans:"Vergevensgezind",mean:"Zeer vergevensgezind",exar:"إِنَّ اللَّهَ غَفُورٌ رَحِيمٌ",exnl:"Allah is Vergevensgezind, Barmhartig."},
+{id:45,ar:"عَزِيز",tr:"ʿazīz",gram:"Bijvoeglijk naamwoord",trans:"Almachtig / Verheven",mean:"Almachtig, Onoverwinnelijk",exar:"إِنَّ اللَّهَ عَزِيزٌ حَكِيمٌ",exnl:"Allah is Almachtig, Alwijs."},
+{id:46,ar:"كَبِير",tr:"kabīr",gram:"Bijvoeglijk naamwoord",trans:"Groot / de Grootse",mean:"Groot, de Grootse",exar:"إِنَّ اللَّهَ كَانَ عَلِيًّا كَبِيرًا",exnl:"Allah is Verheven, de Grootse."},
+{id:47,ar:"عَلِيّ",tr:"ʿalī",gram:"Bijvoeglijk naamwoord",trans:"Verheven",mean:"Verheven, de Allerhoogste",exar:"وَهُوَ الْعَلِيُّ الْعَظِيمُ",exnl:"Hij is de Verhevene, de Geweldige."},
+{id:48,ar:"عَظِيم",tr:"ʿaẓīm",gram:"Bijvoeglijk naamwoord",trans:"Geweldig / Groots",mean:"Geweldig, groots",exar:"سُبْحَانَ رَبِّيَ الْعَظِيمِ",exnl:"Glorie zij mijn Heer, de Geweldige."},
+{id:49,ar:"حَيّ",tr:"ḥayy",gram:"Bijvoeglijk naamwoord",trans:"De Levende",mean:"De Levende",exar:"اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",exnl:"Allah – de Levende, de Zelfbestaande."},
+{id:50,ar:"قَيُّوم",tr:"qayyūm",gram:"Bijvoeglijk naamwoord",trans:"De Zelfbestaande",mean:"De Zelfbestaande, Onderhouder",exar:"اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",exnl:"Allah – de Levende, de Zelfbestaande."},
+{id:51,ar:"رَبّ",tr:"rabb",gram:"Zelfstandig nw. (mann.)",trans:"Heer",mean:"Heer, Meester",exar:"الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",exnl:"Alle lof zij Allah, Heer der Werelden."},
+{id:52,ar:"إِلَٰه",tr:"ilāh",gram:"Zelfstandig nw. (mann.)",trans:"God / godheid",mean:"God, godheid",exar:"لَا إِلَٰهَ إِلَّا اللَّهُ",exnl:"Er is geen god dan Allah."},
+{id:53,ar:"دِين",tr:"dīn",gram:"Zelfstandig nw. (mann.)",trans:"Godsdienst",mean:"Godsdienst, manier van leven",exar:"إِنَّ الدِّينَ عِنْدَ اللَّهِ الْإِسْلَامُ",exnl:"De godsdienst bij Allah is de Islam."},
+{id:54,ar:"إِسْلَام",tr:"islām",gram:"Zelfstandig nw. (mann.)",trans:"Islam",mean:"Overgave aan Allah",exar:"وَرَضِيتُ لَكُمُ الْإِسْلَامَ دِينًا",exnl:"Ik heb voor jullie de Islam als godsdienst gekozen."},
+{id:55,ar:"إِيمَان",tr:"īmān",gram:"Zelfstandig nw. (mann.)",trans:"Geloof",mean:"Geloof",exar:"فَزَادَهُمْ إِيمَانًا",exnl:"Het versterkte hen in geloof."},
+{id:56,ar:"تَقْوَى",tr:"taqwā",gram:"Zelfstandig nw. (vr.)",trans:"Godsvrees",mean:"Godsvrees, vroomheid",exar:"إِنَّ أَكْرَمَكُمْ عِنْدَ اللَّهِ أَتْقَاكُمْ",exnl:"De meest edele bij Allah is de godvruchtigste."},
+{id:57,ar:"تَوْبَة",tr:"tawba",gram:"Zelfstandig nw. (vr.)",trans:"Berouw",mean:"Berouw, terugkeer naar Allah",exar:"إِنَّ اللَّهَ يُحِبُّ التَّوَّابِينَ",exnl:"Allah houdt van degenen die berouw tonen."},
+{id:58,ar:"صَبْر",tr:"ṣabr",gram:"Zelfstandig nw. (mann.)",trans:"Geduld",mean:"Geduld, standvastigheid",exar:"إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",exnl:"Allah is met de geduldigen."},
+{id:59,ar:"شُكْر",tr:"shukr",gram:"Zelfstandig nw. (mann.)",trans:"Dankbaarheid",mean:"Dankbaarheid",exar:"لَئِنْ شَكَرْتُمْ لَأَزِيدَنَّكُمْ",exnl:"Als jullie dankbaar zijn, zal Ik meer geven."},
+{id:60,ar:"ذِكْر",tr:"dhikr",gram:"Zelfstandig nw. (mann.)",trans:"Herdenking / gedenken",mean:"Herdenking, het gedenken van Allah",exar:"أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",exnl:"Door het gedenken van Allah komen harten tot rust."},
+{id:61,ar:"صَلَاة",tr:"ṣalāh",gram:"Zelfstandig nw. (vr.)",trans:"Gebed",mean:"Gebed",exar:"أَقِيمُوا الصَّلَاةَ",exnl:"Verricht het gebed."},
+{id:62,ar:"زَكَاة",tr:"zakāh",gram:"Zelfstandig nw. (vr.)",trans:"Aalmoes / zuivering",mean:"Verplichte aalmoes, zuivering",exar:"وَآتُوا الزَّكَاةَ",exnl:"Geeft de verplichte aalmoes."},
+{id:63,ar:"صِيَام",tr:"ṣiyām",gram:"Zelfstandig nw. (mann.)",trans:"Vasten",mean:"Vasten",exar:"كُتِبَ عَلَيْكُمُ الصِّيَامُ",exnl:"Vasten is jullie voorgeschreven."},
+{id:64,ar:"حَجّ",tr:"ḥajj",gram:"Zelfstandig nw. (mann.)",trans:"Bedevaart",mean:"Bedevaart naar Mekka",exar:"وَلِلَّهِ عَلَى النَّاسِ حِجُّ الْبَيْتِ",exnl:"Allah heeft de mensen de bedevaart naar het Huis verplicht."},
+{id:65,ar:"جِهَاد",tr:"jihād",gram:"Zelfstandig nw. (mann.)",trans:"Inspanning / strijd",mean:"Strijd, inspanning voor Allah",exar:"وَجَاهِدُوا فِي اللَّهِ حَقَّ جِهَادِهِ",exnl:"En strijd voor Allah zoals het hoort te strijden."},
+{id:66,ar:"حَقّ",tr:"ḥaqq",gram:"Zelfstandig nw. (mann.)",trans:"Waarheid / recht",mean:"Waarheid, recht",exar:"وَقُلِ الْحَقُّ مِنْ رَبِّكُمْ",exnl:"De waarheid is van jullie Heer."},
+{id:67,ar:"بِرّ",tr:"birr",gram:"Zelfstandig nw. (mann.)",trans:"Goedheid / vroomheid",mean:"Goedheid, vroomheid",exar:"لَنْ تَنَالُوا الْبِرَّ حَتَّى تُنفِقُوا",exnl:"Jullie bereiken vroomheid pas als jullie uitgeven."},
+{id:68,ar:"خَيْر",tr:"khayr",gram:"Zelfstandig nw. (mann.)",trans:"Goed / beter",mean:"Goed, beter",exar:"وَمَا تَفْعَلُوا مِنْ خَيْرٍ يَعْلَمْهُ اللَّهُ",exnl:"Wat jullie aan goeds doen, Allah weet het."},
+{id:69,ar:"شَرّ",tr:"sharr",gram:"Zelfstandig nw. (mann.)",trans:"Kwaad / slecht",mean:"Kwaad, slechtheid",exar:"مِنْ شَرِّ مَا خَلَقَ",exnl:"Van het kwaad van wat Hij schiep."},
+{id:70,ar:"نِعْمَة",tr:"niʿma",gram:"Zelfstandig nw. (vr.)",trans:"Gunst / zegen",mean:"Gunst, zegen",exar:"وَإِنْ تَعُدُّوا نِعْمَةَ اللَّهِ لَا تُحْصُوهَا",exnl:"Als jullie de gunsten van Allah tellen, kunnen jullie ze niet optellen."},
+{id:71,ar:"نَفْس",tr:"nafs",gram:"Zelfstandig nw. (vr.)",trans:"Ziel / zelf",mean:"Ziel, zelf",exar:"كُلُّ نَفْسٍ ذَائِقَةُ الْمَوْتِ",exnl:"Elke ziel zal de dood proeven."},
+{id:72,ar:"قَلْب",tr:"qalb",gram:"Zelfstandig nw. (mann.)",trans:"Hart",mean:"Hart",exar:"إِنَّ فِي ذَٰلِكَ لَذِكْرَى لِمَنْ كَانَ لَهُ قَلْبٌ",exnl:"Daarin is een herinnering voor wie een hart heeft."},
+{id:73,ar:"عَقْل",tr:"ʿaql",gram:"Zelfstandig nw. (mann.)",trans:"Verstand",mean:"Verstand, rede",exar:"أَفَلَا تَعْقِلُونَ",exnl:"Begrijpen jullie dan niet?"},
+{id:74,ar:"رُوح",tr:"rūḥ",gram:"Zelfstandig nw. (mann./vr.)",trans:"Geest / ziel",mean:"Geest, ziel",exar:"وَيَسْأَلُونَكَ عَنِ الرُّوحِ",exnl:"En zij vragen jou over de geest."},
+{id:75,ar:"إِنْسَان",tr:"insān",gram:"Zelfstandig nw. (mann.)",trans:"Mens",mean:"Mens",exar:"خَلَقَ الْإِنْسَانَ مِنْ عَلَقٍ",exnl:"Hij schiep de mens uit een bloedklonter."},
+{id:76,ar:"بَشَر",tr:"bashar",gram:"Zelfstandig nw. (mann.)",trans:"Mens",mean:"Menselijk wezen",exar:"مَا كَانَ لِبَشَرٍ أَنْ يُكَلِّمَهُ اللَّهُ",exnl:"Het past geen mens dat Allah hem spreekt."},
+{id:77,ar:"نَاس",tr:"nās",gram:"Zelfstandig nw. (mv.)",trans:"Mensen",mean:"Mensen, mensheid",exar:"يَا أَيُّهَا النَّاسُ اتَّقُوا رَبَّكُمْ",exnl:"O mensen, vrees jullie Heer."},
+{id:78,ar:"أُمَّة",tr:"umma",gram:"Zelfstandig nw. (vr.)",trans:"Gemeenschap / volk",mean:"Gemeenschap, volk",exar:"كُنْتُمْ خَيْرَ أُمَّةٍ أُخْرِجَتْ لِلنَّاسِ",exnl:"Jullie zijn de beste gemeenschap die voor de mensen is voortgebracht."},
+{id:79,ar:"قَوْم",tr:"qawm",gram:"Zelfstandig nw. (mann.)",trans:"Volk / stam",mean:"Volk, stam",exar:"يَا قَوْمِ اعْبُدُوا اللَّهَ",exnl:"O mijn volk, aanbidt Allah."},
+{id:80,ar:"نَبِيّ",tr:"nabī",gram:"Zelfstandig nw. (mann.)",trans:"Profeet",mean:"Profeet",exar:"مَا كَانَ مُحَمَّدٌ أَبَا أَحَدٍ مِنْ رِجَالِكُمْ",exnl:"Mohammed was de vader van geen van jullie mannen."},
+{id:81,ar:"رَسُول",tr:"rasūl",gram:"Zelfstandig nw. (mann.)",trans:"Boodschapper",mean:"Boodschapper, gezant",exar:"مُحَمَّدٌ رَسُولُ اللَّهِ",exnl:"Mohammed is de Boodschapper van Allah."},
+{id:82,ar:"مَلَك",tr:"malak",gram:"Zelfstandig nw. (mann.)",trans:"Engel",mean:"Engel",exar:"وَالْمَلَائِكَةُ يُسَبِّحُونَ بِحَمْدِ رَبِّهِمْ",exnl:"De engelen verheerlijken hun Heer."},
+{id:83,ar:"شَيْطَان",tr:"shayṭān",gram:"Zelfstandig nw. (mann.)",trans:"Satan / duivel",mean:"Satan, duivel",exar:"إِنَّ الشَّيْطَانَ كَانَ لِلْإِنْسَانِ عَدُوًّا مُبِينًا",exnl:"Satan is een duidelijke vijand voor de mens."},
+{id:84,ar:"جِنّ",tr:"jinn",gram:"Zelfstandig nw.",trans:"Djinn",mean:"Djinn (geestelijk wezen)",exar:"قُلْ أُوحِيَ إِلَيَّ أَنَّهُ اسْتَمَعَ نَفَرٌ مِنَ الْجِنِّ",exnl:"Zeg: Mij is geopenbaard dat een groep djinn luisterde."},
+{id:85,ar:"مُؤْمِن",tr:"muʾmin",gram:"Zelfstandig nw. / bijv. nw.",trans:"Gelovige",mean:"Gelovige",exar:"إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ",exnl:"De gelovigen zijn slechts broeders."},
+{id:86,ar:"مُسْلِم",tr:"muslim",gram:"Zelfstandig nw. / bijv. nw.",trans:"Moslim",mean:"Moslim, gelovige",exar:"وَأَنَا أَوَّلُ الْمُسْلِمِينَ",exnl:"En ik ben de eerste der moslims."},
+{id:87,ar:"كَافِر",tr:"kāfir",gram:"Zelfstandig nw. (mann.)",trans:"Ongelovige",mean:"Ongelovige",exar:"لَا يُحِبُّ اللَّهُ الْكَافِرِينَ",exnl:"Allah houdt niet van de ongelovigen."},
+{id:88,ar:"مُنَافِق",tr:"munāfiq",gram:"Zelfstandig nw. (mann.)",trans:"Huichelaar",mean:"Huichelaar",exar:"إِنَّ الْمُنَافِقِينَ فِي الدَّرْكِ الْأَسْفَلِ",exnl:"De huichelaars zijn in de diepste laag van het Vuur."},
+{id:89,ar:"ظَالِم",tr:"ẓālim",gram:"Zelfstandig nw. (mann.)",trans:"Onrechtpleger",mean:"Onrechtpleger",exar:"وَاللَّهُ لَا يُحِبُّ الظَّالِمِينَ",exnl:"Allah houdt niet van onrechtplegers."},
+{id:90,ar:"مُتَّقِي",tr:"muttaqī",gram:"Zelfstandig nw. (mann.)",trans:"Godvruchtige",mean:"Godvruchtig persoon",exar:"إِنَّ اللَّهَ يُحِبُّ الْمُتَّقِينَ",exnl:"Allah houdt van de godvruchtigen."},
+{id:91,ar:"أَرْض",tr:"arḍ",gram:"Zelfstandig nw. (vr.)",trans:"Aarde",mean:"Aarde, grond",exar:"لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ",exnl:"Hem behoort wat in hemelen en aarde is."},
+{id:92,ar:"سَمَاء",tr:"samāʾ",gram:"Zelfstandig nw. (vr.)",trans:"Hemel",mean:"Hemel",exar:"وَبَنَيْنَا فَوْقَكُمْ سَبْعًا شِدَادًا",exnl:"Wij bouwden boven jullie zeven stevige hemelen."},
+{id:93,ar:"شَمْس",tr:"shams",gram:"Zelfstandig nw. (vr.)",trans:"Zon",mean:"Zon",exar:"وَالشَّمْسُ تَجْرِي لِمُسْتَقَرٍّ لَهَا",exnl:"En de zon loopt naar haar vaste rustplaats."},
+{id:94,ar:"قَمَر",tr:"qamar",gram:"Zelfstandig nw. (mann.)",trans:"Maan",mean:"Maan",exar:"وَالْقَمَرَ قَدَّرْنَاهُ مَنَازِلَ",exnl:"En de maan hebben Wij standen gegeven."},
+{id:95,ar:"نَهْر",tr:"nahr",gram:"Zelfstandig nw. (mann.)",trans:"Rivier",mean:"Rivier, stroom",exar:"فِيهَا أَنْهَارٌ مِنْ مَاءٍ",exnl:"Daarin zijn rivieren van water."},
+{id:96,ar:"بَحْر",tr:"baḥr",gram:"Zelfstandig nw. (mann.)",trans:"Zee",mean:"Zee, oceaan",exar:"ظَهَرَ الْفَسَادُ فِي الْبَرِّ وَالْبَحْرِ",exnl:"Bederf is zichtbaar geworden op land en zee."},
+{id:97,ar:"جَبَل",tr:"jabal",gram:"Zelfstandig nw. (mann.)",trans:"Berg",mean:"Berg",exar:"وَأَلْقَى فِي الْأَرْضِ رَوَاسِيَ",exnl:"Hij plaatste bergen op de aarde."},
+{id:98,ar:"مَاء",tr:"māʾ",gram:"Zelfstandig nw. (mann.)",trans:"Water",mean:"Water",exar:"وَجَعَلْنَا مِنَ الْمَاءِ كُلَّ شَيْءٍ حَيٍّ",exnl:"Wij maakten elk levend ding van water."},
+{id:99,ar:"نُور",tr:"nūr",gram:"Zelfstandig nw. (mann.)",trans:"Licht",mean:"Licht",exar:"اللَّهُ نُورُ السَّمَاوَاتِ وَالْأَرْضِ",exnl:"Allah is het Licht van hemelen en aarde."},
+{id:100,ar:"ظُلُمَات",tr:"ẓulumāt",gram:"Zelfstandig nw. (mv.)",trans:"Duisternissen",mean:"Duisternissen",exar:"يُخْرِجُهُمْ مِنَ الظُّلُمَاتِ إِلَى النُّورِ",exnl:"Hij brengt hen uit duisternissen naar het Licht."},
+{id:101,ar:"جَنَّة",tr:"janna",gram:"Zelfstandig nw. (vr.)",trans:"Paradijs",mean:"Paradijs, tuin",exar:"أُعِدَّتْ لِلْمُتَّقِينَ",exnl:"Voorbereid voor de godvruchtigen."},
+{id:102,ar:"نَار",tr:"nār",gram:"Zelfstandig nw. (vr.)",trans:"Vuur / Hel",mean:"Vuur, Hel",exar:"وَاتَّقُوا النَّارَ الَّتِي أُعِدَّتْ لِلْكَافِرِينَ",exnl:"Vrees het Vuur, bereid voor de ongelovigen."},
+{id:103,ar:"جَهَنَّم",tr:"jahannam",gram:"Eigennaam (vr.)",trans:"Hel / Jahannam",mean:"Hel",exar:"وَإِنَّ جَهَنَّمَ لَمَوْعِدُهُمْ أَجْمَعِينَ",exnl:"Jahannam is hun gezamenlijke beloofde bestemming."},
+{id:104,ar:"يَوْم",tr:"yawm",gram:"Zelfstandig nw. (mann.)",trans:"Dag",mean:"Dag",exar:"يَوْمَ الْقِيَامَةِ",exnl:"De Dag der Opstanding."},
+{id:105,ar:"قِيَامَة",tr:"qiyāma",gram:"Zelfstandig nw. (vr.)",trans:"Opstanding",mean:"Opstanding",exar:"وَأَنَّ السَّاعَةَ آتِيَةٌ",exnl:"Het Uur zal komen."},
+{id:106,ar:"آخِرَة",tr:"ākhira",gram:"Zelfstandig nw. (vr.)",trans:"Hiernamaals",mean:"Het hiernamaals",exar:"وَالدَّارُ الْآخِرَةُ خَيْرٌ",exnl:"Het verblijf van het hiernamaals is beter."},
+{id:107,ar:"دُنْيَا",tr:"dunyā",gram:"Zelfstandig nw. (vr.)",trans:"Wereld / aards leven",mean:"Wereld, het aardse leven",exar:"وَمَا الْحَيَاةُ الدُّنْيَا إِلَّا مَتَاعُ الْغُرُورِ",exnl:"Het aardse leven is slechts misleidend genot."},
+{id:108,ar:"حَيَاة",tr:"ḥayāh",gram:"Zelfstandig nw. (vr.)",trans:"Leven",mean:"Leven",exar:"كُلُّ نَفْسٍ ذَائِقَةُ الْمَوْتِ",exnl:"Elke ziel zal de dood proeven."},
+{id:109,ar:"مَوْت",tr:"mawt",gram:"Zelfstandig nw. (mann.)",trans:"Dood",mean:"Dood",exar:"الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ",exnl:"Degene die dood en leven schiep."},
+{id:110,ar:"عَذَاب",tr:"ʿadhāb",gram:"Zelfstandig nw. (mann.)",trans:"Bestraffing / pijn",mean:"Bestraffing, pijn",exar:"لَهُمْ عَذَابٌ أَلِيمٌ",exnl:"Zij zullen een pijnlijke bestraffing hebben."},
+{id:111,ar:"ثَوَاب",tr:"thawāb",gram:"Zelfstandig nw. (mann.)",trans:"Beloning",mean:"Beloning",exar:"وَاللَّهُ عِنْدَهُ حُسْنُ الثَّوَابِ",exnl:"Bij Allah is de beste beloning."},
+{id:112,ar:"مِيزَان",tr:"mīzān",gram:"Zelfstandig nw. (mann.)",trans:"Weegschaal",mean:"Weegschaal, balans",exar:"وَنَضَعُ الْمَوَازِينَ الْقِسْطَ",exnl:"Wij plaatsen de rechtvaardige weegschalen."},
+{id:113,ar:"حِسَاب",tr:"ḥisāb",gram:"Zelfstandig nw. (mann.)",trans:"Afrekening",mean:"Afrekening, berekening",exar:"إِنَّ إِلَيْنَا إِيَابَهُمْ ثُمَّ إِنَّ عَلَيْنَا حِسَابَهُمْ",exnl:"Hun terugkeer is naar Ons, en hun afrekening is bij Ons."},
+{id:114,ar:"كِتَاب",tr:"kitāb",gram:"Zelfstandig nw. (mann.)",trans:"Boek",mean:"Boek, geschrift",exar:"ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ",exnl:"Dat is het Boek, zonder twijfel."},
+{id:115,ar:"قُرْآن",tr:"qurʾān",gram:"Eigennaam (mann.)",trans:"Koran",mean:"De Koran",exar:"إِنَّ هَٰذَا الْقُرْآنَ يَهْدِي",exnl:"Voorwaar, deze Koran leidt."},
+{id:116,ar:"آيَة",tr:"āya",gram:"Zelfstandig nw. (vr.)",trans:"Teken / vers",mean:"Teken, vers",exar:"تِلْكَ آيَاتُ اللَّهِ",exnl:"Dit zijn de tekenen van Allah."},
+{id:117,ar:"سُورَة",tr:"sūra",gram:"Zelfstandig nw. (vr.)",trans:"Hoofdstuk (sura)",mean:"Hoofdstuk van de Koran",exar:"فَأْتُوا بِسُورَةٍ مِنْ مِثْلِهِ",exnl:"Breng dan een sura voort die ermee te vergelijken is."},
+{id:118,ar:"عِلْم",tr:"ʿilm",gram:"Zelfstandig nw. (mann.)",trans:"Kennis",mean:"Kennis, wetenschap",exar:"وَفَوْقَ كُلِّ ذِي عِلْمٍ عَلِيمٌ",exnl:"Boven elke kenner is er Eén die alweet."},
+{id:119,ar:"حِكْمَة",tr:"ḥikma",gram:"Zelfstandig nw. (vr.)",trans:"Wijsheid",mean:"Wijsheid",exar:"يُؤْتِي الْحِكْمَةَ مَنْ يَشَاءُ",exnl:"Hij geeft wijsheid aan wie Hij wil."},
+{id:120,ar:"وَحْي",tr:"waḥy",gram:"Zelfstandig nw. (mann.)",trans:"Openbaring",mean:"Openbaring",exar:"وَمَا يَنْطِقُ عَنِ الْهَوَى إِنْ هُوَ إِلَّا وَحْيٌ يُوحَى",exnl:"Hij spreekt niet uit eigen begeerte; het is slechts openbaring."},
+{id:121,ar:"قَالَ",tr:"qāla",gram:"Werkwoord (verl. tijd)",trans:"Hij zei",mean:"Hij zei / sprak",exar:"قَالَ رَبِّ اغْفِرْ لِي",exnl:"Hij zei: Mijn Heer, vergeef mij."},
+{id:122,ar:"أَمَرَ",tr:"amara",gram:"Werkwoord (verl. tijd)",trans:"Hij beval",mean:"Hij beval / opdroeg",exar:"إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ",exnl:"Allah beveelt rechtvaardigheid."},
+{id:123,ar:"نَهَى",tr:"nahā",gram:"Werkwoord (verl. tijd)",trans:"Hij verbood",mean:"Hij verbood / weerhield",exar:"يَأْمُرُهُمْ بِالْمَعْرُوفِ وَيَنْهَاهُمْ عَنِ الْمُنْكَرِ",exnl:"Hij beveelt hen goeds en weert hen van kwaad."},
+{id:124,ar:"سَأَلَ",tr:"saʾala",gram:"Werkwoord (verl. tijd)",trans:"Hij vroeg",mean:"Hij vroeg / smeekte",exar:"وَإِذَا سَأَلَكَ عِبَادِي عَنِّي",exnl:"Als Mijn dienaren jou over Mij vragen."},
+{id:125,ar:"دَعَا",tr:"daʿā",gram:"Werkwoord (verl. tijd)",trans:"Hij riep / smeekte",mean:"Hij riep, smeekte, nodigde uit",exar:"وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ",exnl:"Jullie Heer zei: Roep Mij aan, Ik zal antwoorden."},
+{id:126,ar:"آمَنَ",tr:"āmana",gram:"Werkwoord (verl. tijd)",trans:"Hij geloofde",mean:"Hij geloofde",exar:"الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ",exnl:"Degenen die geloven en goede daden verrichten."},
+{id:127,ar:"عَمَلَ",tr:"ʿamala",gram:"Werkwoord (verl. tijd)",trans:"Hij deed",mean:"Hij deed / werkte",exar:"مَنْ عَمِلَ صَالِحًا فَلِنَفْسِهِ",exnl:"Wie goeds doet, doet dat voor zichzelf."},
+{id:128,ar:"اتَّقَى",tr:"ittaqā",gram:"Werkwoord (verl. tijd)",trans:"Hij was godvruchtig",mean:"Hij was godvruchtig",exar:"وَمَنْ يَتَّقِ اللَّهَ يَجْعَلْ لَهُ مَخْرَجًا",exnl:"Wie Allah vreest, voor hem maakt Hij een uitweg."},
+{id:129,ar:"تَابَ",tr:"tāba",gram:"Werkwoord (verl. tijd)",trans:"Hij toonde berouw",mean:"Hij toonde berouw",exar:"إِنَّ اللَّهَ يُحِبُّ التَّوَّابِينَ",exnl:"Allah houdt van degenen die berouw tonen."},
+{id:130,ar:"صَبَرَ",tr:"ṣabara",gram:"Werkwoord (verl. tijd)",trans:"Hij had geduld",mean:"Hij had geduld",exar:"وَاللَّهُ يُحِبُّ الصَّابِرِينَ",exnl:"Allah houdt van de geduldigen."},
+{id:131,ar:"شَكَرَ",tr:"shakara",gram:"Werkwoord (verl. tijd)",trans:"Hij was dankbaar",mean:"Hij was dankbaar",exar:"لَئِنْ شَكَرْتُمْ لَأَزِيدَنَّكُمْ",exnl:"Als jullie dankbaar zijn, geef Ik meer."},
+{id:132,ar:"ذَكَرَ",tr:"dhakara",gram:"Werkwoord (verl. tijd)",trans:"Hij herdacht",mean:"Hij herdacht / noemde",exar:"فَاذْكُرُونِي أَذْكُرْكُمْ",exnl:"Gedenk Mij, Ik zal jullie gedenken."},
+{id:133,ar:"عَبَدَ",tr:"ʿabada",gram:"Werkwoord (verl. tijd)",trans:"Hij aanbad",mean:"Hij aanbad / diende",exar:"وَمَا خَلَقْتُ الْجِنَّ وَالْإِنْسَ إِلَّا لِيَعْبُدُونِ",exnl:"Ik schiep djinn en mensen alleen om Mij te aanbidden."},
+{id:134,ar:"أَطَاعَ",tr:"aṭāʿa",gram:"Werkwoord (verl. tijd)",trans:"Hij gehoorzaamde",mean:"Hij gehoorzaamde",exar:"وَأَطِيعُوا اللَّهَ وَالرَّسُولَ",exnl:"Gehoorzaam Allah en de Boodschapper."},
+{id:135,ar:"كَفَرَ",tr:"kafara",gram:"Werkwoord (verl. tijd)",trans:"Hij was ongelovig",mean:"Hij was ongelovig",exar:"وَمَنْ كَفَرَ فَإِنَّ اللَّهَ غَنِيٌّ",exnl:"En wie ongelovig is – Allah is Onafhankelijk."},
+{id:136,ar:"خَلَقَ",tr:"khalaqa",gram:"Werkwoord (verl. tijd)",trans:"Hij schiep",mean:"Hij schiep",exar:"خَلَقَ الْإِنْسَانَ مِنْ عَلَقٍ",exnl:"Hij schiep de mens uit een bloedklonter."},
+{id:137,ar:"عَلِمَ",tr:"ʿalima",gram:"Werkwoord (verl. tijd)",trans:"Hij wist",mean:"Hij wist",exar:"وَاللَّهُ بِكُلِّ شَيْءٍ عَلِيمٌ",exnl:"Allah is alwetend over alles."},
+{id:138,ar:"رَزَقَ",tr:"razaqa",gram:"Werkwoord (verl. tijd)",trans:"Hij voorzag",mean:"Hij voorzag in levensonderhoud",exar:"وَاللَّهُ يَرْزُقُ مَنْ يَشَاءُ",exnl:"Allah voorziet wie Hij wil."},
+{id:139,ar:"هَدَى",tr:"hadā",gram:"Werkwoord (verl. tijd)",trans:"Hij leidde",mean:"Hij leidde / leiding gaf",exar:"اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",exnl:"Leidt ons het rechte pad."},
+{id:140,ar:"غَفَرَ",tr:"ghafara",gram:"Werkwoord (verl. tijd)",trans:"Hij vergaf",mean:"Hij vergaf",exar:"إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا",exnl:"Allah vergeeft alle zonden."},
+{id:141,ar:"نَصَرَ",tr:"naṣara",gram:"Werkwoord (verl. tijd)",trans:"Hij hielp",mean:"Hij hielp / ondersteunde",exar:"إِنْ تَنْصُرُوا اللَّهَ يَنْصُرْكُمْ",exnl:"Als jullie Allah helpen, helpt Hij jullie."},
+{id:142,ar:"أَنْزَلَ",tr:"anzala",gram:"Werkwoord (verl. tijd)",trans:"Hij zond neer",mean:"Hij zond neer",exar:"وَأَنْزَلَ التَّوْرَاةَ وَالْإِنْجِيلَ",exnl:"Hij zond de Thora en het Evangelie neer."},
+{id:143,ar:"جَاءَ",tr:"jāʾa",gram:"Werkwoord (verl. tijd)",trans:"Hij kwam",mean:"Hij kwam",exar:"جَاءَ الْحَقُّ وَزَهَقَ الْبَاطِلُ",exnl:"De waarheid is gekomen en het valse is verdwenen."},
+{id:144,ar:"دَخَلَ",tr:"dakhala",gram:"Werkwoord (verl. tijd)",trans:"Hij betrad",mean:"Hij betrad, ging naar binnen",exar:"وَادْخُلُوا الْجَنَّةَ",exnl:"En gaat het Paradijs in."},
+{id:145,ar:"خَرَجَ",tr:"kharaja",gram:"Werkwoord (verl. tijd)",trans:"Hij vertrok",mean:"Hij vertrok, ging naar buiten",exar:"فَخَرَجَ مِنْهَا خَائِفًا",exnl:"Hij vertrok er bevreesd vandaan."},
+{id:146,ar:"وَجَدَ",tr:"wajada",gram:"Werkwoord (verl. tijd)",trans:"Hij vond",mean:"Hij vond / ontdekte",exar:"وَجَدَ اللَّهَ عِنْدَهُ",exnl:"Hij vond Allah bij hem."},
+{id:147,ar:"رَأَى",tr:"raʾā",gram:"Werkwoord (verl. tijd)",trans:"Hij zag",mean:"Hij zag",exar:"أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ",exnl:"Heb jij niet gezien hoe jouw Heer handelde?"},
+{id:148,ar:"سَمِعَ",tr:"samiʿa",gram:"Werkwoord (verl. tijd)",trans:"Hij hoorde",mean:"Hij hoorde",exar:"قَدْ سَمِعَ اللَّهُ قَوْلَ الَّتِي تُجَادِلُكَ",exnl:"Allah hoorde de woorden van degene die met jou redetwistte."},
+{id:149,ar:"أَرْسَلَ",tr:"arsala",gram:"Werkwoord (verl. tijd)",trans:"Hij zond",mean:"Hij stuurde / zond",exar:"إِنَّا أَرْسَلْنَاكَ شَاهِدًا",exnl:"Wij stuurden jou als getuige."},
+{id:150,ar:"بَعَثَ",tr:"baʿatha",gram:"Werkwoord (verl. tijd)",trans:"Hij zond / wekte",mean:"Hij zond / wekte op",exar:"ثُمَّ بَعَثْنَاكُمْ مِنْ بَعْدِ مَوْتِكُمْ",exnl:"Daarna wekten Wij jullie op na jullie dood."},
+{id:151,ar:"كَبِير",tr:"kabīr",gram:"Bijvoeglijk naamwoord",trans:"Groot",mean:"Groot",exar:"إِنَّ اللَّهَ كَانَ عَلِيًّا كَبِيرًا",exnl:"Allah is Verheven, de Grootse."},
+{id:152,ar:"صَغِير",tr:"ṣaghīr",gram:"Bijvoeglijk naamwoord",trans:"Klein",mean:"Klein",exar:"لَا يُغَادِرُ صَغِيرَةً وَلَا كَبِيرَةً",exnl:"Het laat niets kleins of groots weg."},
+{id:153,ar:"كَثِير",tr:"kathīr",gram:"Bijvoeglijk naamwoord",trans:"Veel / talrijk",mean:"Veel, talrijk",exar:"وَاذْكُرُوا اللَّهَ كَثِيرًا",exnl:"Gedenk Allah veel."},
+{id:154,ar:"قَلِيل",tr:"qalīl",gram:"Bijvoeglijk naamwoord",trans:"Weinig / gering",mean:"Weinig, gering",exar:"وَمَا أُوتِيتُمْ مِنَ الْعِلْمِ إِلَّا قَلِيلًا",exnl:"Jullie zijn slechts weinig kennis gegeven."},
+{id:155,ar:"جَدِيد",tr:"jadīd",gram:"Bijvoeglijk naamwoord",trans:"Nieuw",mean:"Nieuw",exar:"أَإِنَّا لَمَبْعُوثُونَ خَلْقًا جَدِيدًا",exnl:"Zullen wij opgewekt worden in een nieuwe schepping?"},
+{id:156,ar:"قَدِيم",tr:"qadīm",gram:"Bijvoeglijk naamwoord",trans:"Oud / eeuwig",mean:"Oud, eeuwig",exar:"كَالْعُرْجُونِ الْقَدِيمِ",exnl:"Als een oude dadeltak."},
+{id:157,ar:"صَالِح",tr:"ṣāliḥ",gram:"Bijvoeglijk naamwoord",trans:"Goed / rechtschapen",mean:"Goed, rechtschapen",exar:"وَعَمِلُوا الصَّالِحَاتِ",exnl:"En zij verrichtten rechtschapen daden."},
+{id:158,ar:"فَاسِد",tr:"fāsid",gram:"Bijvoeglijk naamwoord",trans:"Bedorven / corrupt",mean:"Bedorven, corrupt",exar:"وَاللَّهُ لَا يُحِبُّ الْفَسَادَ",exnl:"Allah houdt niet van bederf."},
+{id:159,ar:"كَرِيم",tr:"karīm",gram:"Bijvoeglijk naamwoord",trans:"Edelmoedig / genereus",mean:"Edelmoedig, genereus",exar:"إِنَّهُ لَقُرْآنٌ كَرِيمٌ",exnl:"Het is waarlijk een nobele Koran."},
+{id:160,ar:"عَظِيم",tr:"ʿaẓīm",gram:"Bijvoeglijk naamwoord",trans:"Geweldig",mean:"Geweldig, groot",exar:"وَهُوَ الْعَلِيُّ الْعَظِيمُ",exnl:"Hij is de Verhevene, de Geweldige."},
+{id:161,ar:"أَهْل",tr:"ahl",gram:"Zelfstandig nw. (mann.)",trans:"Familie / volk",mean:"Familie, volk",exar:"أَهْلُ الْكِتَابِ",exnl:"De mensen van het Boek."},
+{id:162,ar:"وَلَد",tr:"walad",gram:"Zelfstandig nw. (mann.)",trans:"Kind",mean:"Kind, nakomeling",exar:"لَمْ يَلِدْ وَلَمْ يُولَدْ",exnl:"Hij heeft niet verwekt en is niet verwekt."},
+{id:163,ar:"أَب",tr:"ab",gram:"Zelfstandig nw. (mann.)",trans:"Vader",mean:"Vader",exar:"مِلَّةَ أَبِيكُمْ إِبْرَاهِيمَ",exnl:"De godsdienst van jullie vader Ibrahim."},
+{id:164,ar:"أُمّ",tr:"umm",gram:"Zelfstandig nw. (vr.)",trans:"Moeder",mean:"Moeder",exar:"وَوَصَّيْنَا الْإِنْسَانَ بِوَالِدَيْهِ",exnl:"Wij droegen de mens zijn ouders op."},
+{id:165,ar:"أَخ",tr:"akh",gram:"Zelfstandig nw. (mann.)",trans:"Broer",mean:"Broer",exar:"إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ",exnl:"De gelovigen zijn slechts broeders."},
+{id:166,ar:"زَوْج",tr:"zawj",gram:"Zelfstandig nw. (mann.)",trans:"Echtgenoot / paar",mean:"Echtgenoot, paar",exar:"وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُمْ مِنْ أَنْفُسِكُمْ أَزْوَاجًا",exnl:"Uit Zijn tekenen is dat Hij uit jezelf paren voor jullie schiep."},
+{id:167,ar:"مَلِك",tr:"malik",gram:"Zelfstandig nw. (mann.)",trans:"Koning",mean:"Koning",exar:"الْمَلِكُ الْقُدُّوسُ",exnl:"De Koning, de Heilige."},
+{id:168,ar:"عَبْد",tr:"ʿabd",gram:"Zelfstandig nw. (mann.)",trans:"Dienaar",mean:"Dienaar, slaaf",exar:"سُبْحَانَ الَّذِي أَسْرَى بِعَبْدِهِ",exnl:"Glorie zij Degene die Zijn dienaar 's nachts deed reizen."},
+{id:169,ar:"صَاحِب",tr:"ṣāḥib",gram:"Zelfstandig nw. (mann.)",trans:"Metgezel / vriend",mean:"Metgezel, vriend",exar:"وَمَا صَاحِبُكُمْ بِمَجْنُونٍ",exnl:"Jullie metgezel is niet krankzinnig."},
+{id:170,ar:"عَدُوّ",tr:"ʿaduww",gram:"Zelfstandig nw. (mann.)",trans:"Vijand",mean:"Vijand",exar:"إِنَّ الشَّيْطَانَ لَكُمْ عَدُوٌّ",exnl:"Satan is een vijand voor jullie."},
+{id:171,ar:"بَيْت",tr:"bayt",gram:"Zelfstandig nw. (mann.)",trans:"Huis",mean:"Huis, tehuis",exar:"وَلِلَّهِ عَلَى النَّاسِ حِجُّ الْبَيْتِ",exnl:"Allah heeft de bedevaart naar het Huis verplicht."},
+{id:172,ar:"مَسْجِد",tr:"masjid",gram:"Zelfstandig nw. (mann.)",trans:"Moskee",mean:"Moskee",exar:"وَأَنَّ الْمَسَاجِدَ لِلَّهِ",exnl:"De moskeeën zijn van Allah."},
+{id:173,ar:"مَدِينَة",tr:"madīna",gram:"Zelfstandig nw. (vr.)",trans:"Stad",mean:"Stad",exar:"وَجَاءَ رَجُلٌ مِنْ أَقْصَى الْمَدِينَةِ",exnl:"Een man uit het verste deel van de stad."},
+{id:174,ar:"طَرِيق",tr:"ṭarīq",gram:"Zelfstandig nw. (mann./vr.)",trans:"Weg / pad",mean:"Weg, pad",exar:"صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ",exnl:"Het pad van degenen die U begunstigd hebt."},
+{id:175,ar:"صِرَاط",tr:"ṣirāṭ",gram:"Zelfstandig nw. (mann.)",trans:"Weg / pad",mean:"Weg, pad (recht pad)",exar:"اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",exnl:"Leidt ons het rechte pad."},
+{id:176,ar:"لَيْل",tr:"layl",gram:"Zelfstandig nw. (mann.)",trans:"Nacht",mean:"Nacht",exar:"وَاللَّيْلِ إِذَا يَغْشَى",exnl:"Bij de nacht als hij omhult."},
+{id:177,ar:"نَهَار",tr:"nahār",gram:"Zelfstandig nw. (mann.)",trans:"Dag",mean:"Dag (daglicht)",exar:"وَجَعَلْنَا النَّهَارَ مَعَاشًا",exnl:"Wij maakten de dag voor het levensonderhoud."},
+{id:178,ar:"وَقْت",tr:"waqt",gram:"Zelfstandig nw. (mann.)",trans:"Tijd / moment",mean:"Tijd, moment",exar:"إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَوْقُوتًا",exnl:"Het gebed is op vaste tijden voorgeschreven."},
+{id:179,ar:"سَاعَة",tr:"sāʿa",gram:"Zelfstandig nw. (vr.)",trans:"Uur / het Uur",mean:"Uur, het Uur (Oordeel)",exar:"يَسْأَلُونَكَ عَنِ السَّاعَةِ",exnl:"Zij vragen jou over het Uur."},
+{id:180,ar:"حَسَن",tr:"ḥasan",gram:"Bijvoeglijk naamwoord",trans:"Goed / mooi",mean:"Goed, mooi",exar:"مَنْ جَاءَ بِالْحَسَنَةِ",exnl:"Wie met een goede daad komt."},
+{id:181,ar:"سَيِّئ",tr:"sayyiʾ",gram:"Bijvoeglijk naamwoord",trans:"Slecht / kwaad",mean:"Slecht, kwaad",exar:"وَمَنْ جَاءَ بِالسَّيِّئَةِ",exnl:"En wie met een slechte daad komt."},
+{id:182,ar:"قَرِيب",tr:"qarīb",gram:"Bijvoeglijk naamwoord",trans:"Nabij",mean:"Nabij, dichtbij",exar:"إِنَّ رَحْمَةَ اللَّهِ قَرِيبٌ مِنَ الْمُحْسِنِينَ",exnl:"Allahs barmhartigheid is nabij de weldoeners."},
+{id:183,ar:"بَعِيد",tr:"baʿīd",gram:"Bijvoeglijk naamwoord",trans:"Ver",mean:"Ver, veraf",exar:"وَمَا هُوَ عَنْهُمْ بِبَعِيدٍ",exnl:"En het is niet ver van hen."},
+{id:184,ar:"شَدِيد",tr:"shadīd",gram:"Bijvoeglijk naamwoord",trans:"Hevig / zwaar",mean:"Hevig, sterk, zwaar",exar:"إِنَّ عَذَابِي لَشَدِيدٌ",exnl:"Mijn bestraffing is waarlijk zwaar."},
+{id:185,ar:"ضَعِيف",tr:"ḍaʿīf",gram:"Bijvoeglijk naamwoord",trans:"Zwak",mean:"Zwak",exar:"وَخُلِقَ الْإِنْسَانُ ضَعِيفًا",exnl:"De mens werd zwak geschapen."},
+{id:186,ar:"مُبِين",tr:"mubīn",gram:"Bijvoeglijk naamwoord",trans:"Duidelijk",mean:"Duidelijk, helder",exar:"إِنَّهُ لَعَدُوٌّ مُبِينٌ",exnl:"Hij is een duidelijke vijand."},
+{id:187,ar:"مُسْتَقِيم",tr:"mustaqīm",gram:"Bijvoeglijk naamwoord",trans:"Recht",mean:"Recht, rechtop, correct",exar:"اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",exnl:"Leidt ons het rechte pad."},
+{id:188,ar:"صَادِق",tr:"ṣādiq",gram:"Bijvoeglijk naamwoord",trans:"Eerlijk / oprecht",mean:"Eerlijk, oprecht",exar:"فَلْيَأْتُوا بِحَدِيثٍ مِثْلِهِ إِنْ كَانُوا صَادِقِينَ",exnl:"Laat hen soortgelijke woorden brengen als zij eerlijk zijn."},
+{id:189,ar:"طَيِّب",tr:"ṭayyib",gram:"Bijvoeglijk naamwoord",trans:"Goed / zuiver",mean:"Goed, zuiver, aangenaam",exar:"كَلِمَةً طَيِّبَةً كَشَجَرَةٍ طَيِّبَةٍ",exnl:"Een goed woord is als een goede boom."},
+{id:190,ar:"حَلِيم",tr:"ḥalīm",gram:"Bijvoeglijk naamwoord",trans:"Geduldig / zachtmoedig",mean:"Geduldig, zachtmoedig",exar:"إِنَّ اللَّهَ غَفُورٌ حَلِيمٌ",exnl:"Allah is Vergevensgezind, Geduldig."},
+{id:191,ar:"كَانَ",tr:"kāna",gram:"Werkwoord (copula, verl. tijd)",trans:"Was",mean:"Was, bestond",exar:"كَانَ اللَّهُ سَمِيعًا بَصِيرًا",exnl:"Allah was Alhorend, Alziend."},
+{id:192,ar:"يَكُون",tr:"yakūn",gram:"Werkwoord (onv. tijd)",trans:"Is / wordt",mean:"Is, wordt, zal zijn",exar:"كُنْ فَيَكُونُ",exnl:"Wees! En het is."},
+{id:193,ar:"شَاءَ",tr:"shāʾa",gram:"Werkwoord (verl. tijd)",trans:"Hij wilde",mean:"Hij wilde / wenste",exar:"وَمَا تَشَاءُونَ إِلَّا أَنْ يَشَاءَ اللَّهُ",exnl:"Jullie willen niets tenzij Allah het wil."},
+{id:194,ar:"أَرَادَ",tr:"arāda",gram:"Werkwoord (verl. tijd)",trans:"Hij wilde / beoogde",mean:"Hij wilde / beoogde",exar:"وَاللَّهُ يُرِيدُ أَنْ يَتُوبَ عَلَيْكُمْ",exnl:"Allah wil jullie vergeven."},
+{id:195,ar:"قَدَرَ",tr:"qadara",gram:"Werkwoord (verl. tijd)",trans:"Hij kon / beschikte",mean:"Hij kon / beschikte over",exar:"وَمَنْ قُدِرَ عَلَيْهِ رِزْقُهُ",exnl:"Degene wiens levensonderhoud beperkt is."},
+{id:196,ar:"اسْتَغْفَرَ",tr:"istaghfara",gram:"Werkwoord (tiende stam)",trans:"Hij vroeg vergiffenis",mean:"Hij vroeg om vergiffenis",exar:"اسْتَغْفِرُوا رَبَّكُمْ",exnl:"Vraag jullie Heer om vergiffenis."},
+{id:197,ar:"تَوَكَّلَ",tr:"tawakkala",gram:"Werkwoord (vijfde stam)",trans:"Hij vertrouwde op",mean:"Hij vertrouwde op (Allah)",exar:"وَمَنْ يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",exnl:"Wie op Allah vertrouwt, Allah is hem voldoende."},
+{id:198,ar:"نَزَلَ",tr:"nazala",gram:"Werkwoord (verl. tijd)",trans:"Hij daalde neer",mean:"Hij daalde neer",exar:"نَزَلَ بِهِ الرُّوحُ الْأَمِينُ",exnl:"De betrouwbare geest daalde ermee neer."},
+{id:199,ar:"صَدَقَ",tr:"ṣadaqa",gram:"Werkwoord (verl. tijd)",trans:"Hij sprak de waarheid",mean:"Hij sprak de waarheid",exar:"وَمَنْ أَصْدَقُ مِنَ اللَّهِ قِيلًا",exnl:"Wie spreekt waarachtiger dan Allah?"},
+{id:200,ar:"حَمِدَ",tr:"ḥamida",gram:"Werkwoord (verl. tijd)",trans:"Hij loofde",mean:"Hij loofde / prees",exar:"الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",exnl:"Alle lof zij Allah, Heer der Werelden."},
+{id:201,ar:"عَيْن",tr:"ʿayn",gram:"Zelfstandig nw. (vr.)",trans:"Oog / bron",mean:"Oog, bron",exar:"جَنَّتَانِ فِيهِمَا عَيْنَانِ تَجْرِيَانِ",exnl:"Twee tuinen met twee stromende bronnen."},
+{id:202,ar:"يَد",tr:"yad",gram:"Zelfstandig nw. (vr.)",trans:"Hand",mean:"Hand",exar:"يَدُ اللَّهِ فَوْقَ أَيْدِيهِمْ",exnl:"Allahs hand is boven hun handen."},
+{id:203,ar:"وَجْه",tr:"wajh",gram:"Zelfstandig nw. (mann.)",trans:"Gezicht / richting",mean:"Gezicht, richting",exar:"كُلُّ شَيْءٍ هَالِكٌ إِلَّا وَجْهَهُ",exnl:"Alles vergaat behalve Zijn Gelaat."},
+{id:204,ar:"لِسَان",tr:"lisān",gram:"Zelfstandig nw. (mann.)",trans:"Tong / taal",mean:"Tong, taal",exar:"بِلِسَانٍ عَرَبِيٍّ مُبِينٍ",exnl:"In duidelijke Arabische taal."},
+{id:205,ar:"رَأْس",tr:"raʾs",gram:"Zelfstandig nw. (mann.)",trans:"Hoofd",mean:"Hoofd",exar:"وَاشْتَعَلَ الرَّأْسُ شَيْبًا",exnl:"En het hoofd is wit van ouderdom."},
+{id:206,ar:"شَجَر",tr:"shajar",gram:"Zelfstandig nw. (mann.)",trans:"Boom",mean:"Boom, plant",exar:"وَالنَّجْمُ وَالشَّجَرُ يَسْجُدَانِ",exnl:"En de ster en de boom buigen neer."},
+{id:207,ar:"مَاء",tr:"māʾ",gram:"Zelfstandig nw. (mann.)",trans:"Water",mean:"Water",exar:"وَجَعَلْنَا مِنَ الْمَاءِ كُلَّ شَيْءٍ حَيٍّ",exnl:"Wij maakten elk levend ding van water."},
+{id:208,ar:"رِيح",tr:"rīḥ",gram:"Zelfstandig nw. (vr.)",trans:"Wind",mean:"Wind",exar:"وَأَرْسَلْنَا الرِّيَاحَ لَوَاقِحَ",exnl:"Wij stuurden bevruchte winden."},
+{id:209,ar:"عَرَفَ",tr:"ʿarafa",gram:"Werkwoord (verl. tijd)",trans:"Hij kende",mean:"Hij kende / herkende",exar:"يَعْرِفُونَهُ كَمَا يَعْرِفُونَ أَبْنَاءَهُمْ",exnl:"Zij kennen hem zoals zij hun zonen kennen."},
+{id:210,ar:"فَعَلَ",tr:"faʿala",gram:"Werkwoord (verl. tijd)",trans:"Hij deed",mean:"Hij deed / handelde",exar:"أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ",exnl:"Heb je niet gezien hoe jouw Heer handelde?"},
+{id:211,ar:"كَسَبَ",tr:"kasaba",gram:"Werkwoord (verl. tijd)",trans:"Hij verdiende",mean:"Hij verdiende / verwierf",exar:"لَهَا مَا كَسَبَتْ",exnl:"Voor haar is wat zij verdiende."},
+{id:212,ar:"نَسِيَ",tr:"nasiya",gram:"Werkwoord (verl. tijd)",trans:"Hij vergat",mean:"Hij vergat",exar:"نَسُوا اللَّهَ فَنَسِيَهُمْ",exnl:"Zij vergaten Allah, dus vergat Hij hen."},
+{id:213,ar:"صَلَّى",tr:"ṣallā",gram:"Werkwoord (verl. tijd)",trans:"Hij bad / zegende",mean:"Hij bad / zegende",exar:"إِنَّ اللَّهَ وَمَلَائِكَتَهُ يُصَلُّونَ عَلَى النَّبِيِّ",exnl:"Allah en Zijn engelen zenden zegeningen op de Profeet."},
+{id:214,ar:"قَرَأَ",tr:"qaraʾa",gram:"Werkwoord (verl. tijd)",trans:"Hij las",mean:"Hij las / reciteerde",exar:"اقْرَأْ بِاسْمِ رَبِّكَ",exnl:"Lees in de naam van jouw Heer."},
+{id:215,ar:"كَتَبَ",tr:"kataba",gram:"Werkwoord (verl. tijd)",trans:"Hij schreef",mean:"Hij schreef",exar:"كَتَبَ رَبُّكُمْ عَلَى نَفْسِهِ الرَّحْمَةَ",exnl:"Jullie Heer heeft barmhartigheid voor Zichzelf opgelegd."},
+{id:216,ar:"سَجَدَ",tr:"sajada",gram:"Werkwoord (verl. tijd)",trans:"Hij boog neer",mean:"Hij boog neer (in gebed)",exar:"فَاسْجُدُوا لِلَّهِ وَاعْبُدُوا",exnl:"Buig neer voor Allah en aanbidt."},
+{id:217,ar:"رَكَعَ",tr:"rakaʿa",gram:"Werkwoord (verl. tijd)",trans:"Hij knielde",mean:"Hij knielde",exar:"ارْكَعُوا وَاسْجُدُوا",exnl:"Knielt en buigt neer."},
+{id:218,ar:"رَجَعَ",tr:"rajaʿa",gram:"Werkwoord (verl. tijd)",trans:"Hij keerde terug",mean:"Hij keerde terug",exar:"إِنَّا إِلَى اللَّهِ رَاجِعُونَ",exnl:"Wij keren terug naar Allah."},
+{id:219,ar:"أَقَامَ",tr:"aqāma",gram:"Werkwoord (verl. tijd, causatief)",trans:"Hij verrichtte / vestigde",mean:"Hij verrichtte / vestigde",exar:"أَقِيمُوا الصَّلَاةَ",exnl:"Verricht het gebed."},
+{id:220,ar:"سَبَّحَ",tr:"sabbaḥa",gram:"Werkwoord (intensief)",trans:"Hij verheerlijkte",mean:"Hij verheerlijkte Allah",exar:"سَبَّحَ لِلَّهِ مَا فِي السَّمَاوَاتِ",exnl:"Alles in de hemelen verheerlijkte Allah."},
+{id:221,ar:"قَوْل",tr:"qawl",gram:"Zelfstandig nw. (mann.)",trans:"Woord / uitspraak",mean:"Woord, uitspraak",exar:"وَمَنْ أَصْدَقُ مِنَ اللَّهِ قِيلًا",exnl:"Wie spreekt waarachtiger dan Allah?"},
+{id:222,ar:"فِعْل",tr:"fiʿl",gram:"Zelfstandig nw. (mann.)",trans:"Daad / handeling",mean:"Daad, handeling",exar:"وَأَحْسِنُوا إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ",exnl:"Doe goed – Allah houdt van weldoeners."},
+{id:223,ar:"رِزْق",tr:"rizq",gram:"Zelfstandig nw. (mann.)",trans:"Levensonderhoud",mean:"Levensonderhoud, dagelijks brood",exar:"وَاللَّهُ يَرْزُقُ مَنْ يَشَاءُ بِغَيْرِ حِسَابٍ",exnl:"Allah voorziet wie Hij wil zonder rekening."},
+{id:224,ar:"حُبّ",tr:"ḥubb",gram:"Zelfstandig nw. (mann.)",trans:"Liefde",mean:"Liefde",exar:"وَالَّذِينَ آمَنُوا أَشَدُّ حُبًّا لِلَّهِ",exnl:"Degenen die geloven zijn het sterkst in liefde voor Allah."},
+{id:225,ar:"خَوْف",tr:"khawf",gram:"Zelfstandig nw. (mann.)",trans:"Angst / vrees",mean:"Angst, vrees",exar:"أَلَا إِنَّ أَوْلِيَاءَ اللَّهِ لَا خَوْفٌ عَلَيْهِمْ",exnl:"De vrienden van Allah kennen geen vrees."},
+{id:226,ar:"رَجَاء",tr:"rajāʾ",gram:"Zelfstandig nw. (mann.)",trans:"Hoop",mean:"Hoop",exar:"فَمَنْ كَانَ يَرْجُو لِقَاءَ رَبِّهِ",exnl:"Wie hoopt zijn Heer te ontmoeten."},
+{id:227,ar:"غَضَب",tr:"ghaḍab",gram:"Zelfstandig nw. (mann.)",trans:"Woede / toorn",mean:"Woede, toorn",exar:"وَبَاءُوا بِغَضَبٍ مِنَ اللَّهِ",exnl:"Zij keerden terug met Allahs toorn."},
+{id:228,ar:"فِتْنَة",tr:"fitna",gram:"Zelfstandig nw. (vr.)",trans:"Beproeving / verleiding",mean:"Beproeving, verleiding, onrust",exar:"وَالْفِتْنَةُ أَشَدُّ مِنَ الْقَتْلِ",exnl:"Fitna is erger dan doden."},
+{id:229,ar:"ذَنْب",tr:"dhanb",gram:"Zelfstandig nw. (mann.)",trans:"Zonde",mean:"Zonde",exar:"لِيَغْفِرَ لَكَ اللَّهُ مَا تَقَدَّمَ مِنْ ذَنْبِكَ",exnl:"Opdat Allah jouw vroegere zonden vergeeft."},
+{id:230,ar:"مَغْفِرَة",tr:"maghfira",gram:"Zelfstandig nw. (vr.)",trans:"Vergiffenis",mean:"Vergiffenis",exar:"وَمَغْفِرَةٌ مِنَ اللَّهِ وَرِدْوَانٌ",exnl:"Vergiffenis van Allah en tevredenheid."},
+{id:231,ar:"رِضَا",tr:"riḍā",gram:"Zelfstandig nw. (mann.)",trans:"Tevredenheid",mean:"Tevredenheid, welbehagen",exar:"رَضِيَ اللَّهُ عَنْهُمْ وَرَضُوا عَنْهُ",exnl:"Allah is over hen tevreden en zij over Hem."},
+{id:232,ar:"هُدَى",tr:"hudā",gram:"Zelfstandig nw. (mann.)",trans:"Leiding",mean:"Leiding, rechtleiding",exar:"هُدًى لِلْمُتَّقِينَ",exnl:"Leiding voor de godvruchtigen."},
+{id:233,ar:"ضَلَال",tr:"ḍalāl",gram:"Zelfstandig nw. (mann.)",trans:"Dwaling",mean:"Dwaling",exar:"وَمَنْ يُشَاقِقِ الرَّسُولَ يَضِلَّ",exnl:"Wie de Boodschapper tegenstaat, zal dwalen."},
+{id:234,ar:"فُرْقَان",tr:"furqān",gram:"Zelfstandig nw. (mann.)",trans:"Onderscheid",mean:"Onderscheid (tussen goed en kwaad)",exar:"تَبَارَكَ الَّذِي نَزَّلَ الْفُرْقَانَ",exnl:"Gezegend is Degene die het Onderscheid neerzond."},
+{id:235,ar:"كَلِمَة",tr:"kalima",gram:"Zelfstandig nw. (vr.)",trans:"Woord",mean:"Woord, uitspraak",exar:"كَلِمَةً طَيِّبَةً كَشَجَرَةٍ طَيِّبَةٍ",exnl:"Een goed woord is als een goede boom."},
+{id:236,ar:"مَثَل",tr:"mathal",gram:"Zelfstandig nw. (mann.)",trans:"Voorbeeld / vergelijking",mean:"Vergelijking, voorbeeld",exar:"وَيَضْرِبُ اللَّهُ الْأَمْثَالَ لِلنَّاسِ",exnl:"Allah geeft voorbeelden voor de mensen."},
+{id:237,ar:"قِصَّة",tr:"qiṣṣa",gram:"Zelfstandig nw. (vr.)",trans:"Verhaal",mean:"Verhaal, geschiedenis",exar:"نَحْنُ نَقُصُّ عَلَيْكَ أَحْسَنَ الْقَصَصِ",exnl:"Wij vertellen jou het beste verhaal."},
+{id:238,ar:"مَنْ",tr:"man",gram:"Vraagwoord / betrekkelijk vnw.",trans:"Wie",mean:"Wie",exar:"مَنْ يَعْمَلْ سُوءًا يُجْزَ بِهِ",exnl:"Wie kwaad doet, zal ervoor worden vergolden."},
+{id:239,ar:"أَيْن",tr:"ayna",gram:"Vraagwoord",trans:"Waar?",mean:"Waar?",exar:"أَيْنَ مَا كُنْتُمْ",exnl:"Waar jullie ook zijn."},
+{id:240,ar:"مَتَى",tr:"matā",gram:"Vraagwoord",trans:"Wanneer?",mean:"Wanneer?",exar:"مَتَى نَصْرُ اللَّهِ",exnl:"Wanneer komt Allahs hulp?"},
+{id:241,ar:"كَيْف",tr:"kayfa",gram:"Vraagwoord",trans:"Hoe?",mean:"Hoe?",exar:"كَيْفَ تَكْفُرُونَ بِاللَّهِ",exnl:"Hoe kunnen jullie ongelovig zijn in Allah?"},
+{id:242,ar:"هَلْ",tr:"hal",gram:"Vraagdeeltje",trans:"Is het zo / ...?",mean:"Is het zo dat? (ja/nee vraag)",exar:"هَلْ أَتَى عَلَى الْإِنْسَانِ حِينٌ",exnl:"Is er niet een tijdstip voor de mens geweest?"},
+{id:243,ar:"لَعَلَّ",tr:"laʿalla",gram:"Hoop/verwachting deeltje",trans:"Wellicht / misschien",mean:"Wellicht, misschien, zodat",exar:"لَعَلَّكُمْ تَتَّقُونَ",exnl:"Opdat jullie godvruchtig worden."},
+{id:244,ar:"عَالَم",tr:"ʿālam",gram:"Zelfstandig nw. (mann.)",trans:"Wereld / universum",mean:"Wereld, universum",exar:"رَبِّ الْعَالَمِينَ",exnl:"Heer der Werelden."},
+{id:245,ar:"خَلْق",tr:"khalq",gram:"Zelfstandig nw. (mann.)",trans:"Schepping",mean:"Schepping, schepsel",exar:"الَّذِي أَحْسَنَ كُلَّ شَيْءٍ خَلَقَهُ",exnl:"Degene die alles goed schiep."},
+{id:246,ar:"أَمَانَة",tr:"amāna",gram:"Zelfstandig nw. (vr.)",trans:"Vertrouwen / amanah",mean:"Vertrouwen, amanah",exar:"إِنَّ اللَّهَ يَأْمُرُكُمْ أَنْ تُؤَدُّوا الْأَمَانَاتِ",exnl:"Allah beveelt jullie de amanah terug te geven."},
+{id:247,ar:"عَدْل",tr:"ʿadl",gram:"Zelfstandig nw. (mann.)",trans:"Rechtvaardigheid",mean:"Rechtvaardigheid",exar:"إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ",exnl:"Allah beveelt rechtvaardigheid en goedheid."},
+{id:248,ar:"إِحْسَان",tr:"iḥsān",gram:"Zelfstandig nw. (mann.)",trans:"Uitstekendheid / goedheid",mean:"Uitstekendheid, goedheid",exar:"وَاللَّهُ يُحِبُّ الْمُحْسِنِينَ",exnl:"Allah houdt van de weldoeners."},
+{id:249,ar:"فَسَاد",tr:"fasād",gram:"Zelfstandig nw. (mann.)",trans:"Bederf / corruptie",mean:"Bederf, corruptie",exar:"وَاللَّهُ لَا يُحِبُّ الْفَسَادَ",exnl:"Allah houdt niet van bederf."},
+{id:250,ar:"ظُلْم",tr:"ẓulm",gram:"Zelfstandig nw. (mann.)",trans:"Onrecht",mean:"Onrecht, onderdrukking",exar:"إِنَّ الشِّرْكَ لَظُلْمٌ عَظِيمٌ",exnl:"Shirk is waarlijk een groot onrecht."},
+{id:251,ar:"شِرْك",tr:"shirk",gram:"Zelfstandig nw. (mann.)",trans:"Polytheïsme / shirk",mean:"Polytheïsme, naast Allah stellen",exar:"إِنَّ اللَّهَ لَا يَغْفِرُ أَنْ يُشْرَكَ بِهِ",exnl:"Allah vergeeft niet dat iets naast Hem gesteld wordt."},
+{id:252,ar:"كُفْر",tr:"kufr",gram:"Zelfstandig nw. (mann.)",trans:"Ongeloof",mean:"Ongeloof",exar:"وَمَنْ يَتَبَدَّلِ الْكُفْرَ بِالْإِيمَانِ",exnl:"En wie het ongeloof inruilt voor geloof."},
+{id:253,ar:"نِفَاق",tr:"nifāq",gram:"Zelfstandig nw. (mann.)",trans:"Hypocrisie",mean:"Hypocrisie",exar:"وَإِذَا لَقُوا الَّذِينَ آمَنُوا قَالُوا آمَنَّا",exnl:"Wanneer zij de gelovigen ontmoeten, zeggen ze: Wij geloven."},
+{id:254,ar:"قُدْرَة",tr:"qudra",gram:"Zelfstandig nw. (vr.)",trans:"Macht / vermogen",mean:"Macht, vermogen",exar:"بِقُدْرَةِ اللَّهِ",exnl:"Door Allahs macht."},
+{id:255,ar:"إِرَادَة",tr:"irāda",gram:"Zelfstandig nw. (vr.)",trans:"Wil / intentie",mean:"Wil, intentie",exar:"وَاللَّهُ يُرِيدُ أَنْ يَتُوبَ عَلَيْكُمْ",exnl:"Allah wil jullie vergeven."},
+{id:256,ar:"صِدْق",tr:"ṣidq",gram:"Zelfstandig nw. (mann.)",trans:"Oprechtheid",mean:"Oprechtheid, waarachtigheid",exar:"يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَكُونُوا مَعَ الصَّادِقِينَ",exnl:"O gelovigen, vrees Allah en wees met de oprechten."},
+{id:257,ar:"كَذِب",tr:"kadhib",gram:"Zelfstandig nw. (mann.)",trans:"Leugen",mean:"Leugen, onwaarheid",exar:"إِنَّ اللَّهَ لَا يَهْدِي مَنْ هُوَ كَاذِبٌ",exnl:"Allah leidt niet wie leugenachtig is."},
+{id:258,ar:"وَعْد",tr:"waʿd",gram:"Zelfstandig nw. (mann.)",trans:"Belofte",mean:"Belofte",exar:"وَعْدَ اللَّهِ لَا يُخْلِفُ اللَّهُ وَعْدَهُ",exnl:"Allahs belofte – Allah breekt Zijn belofte niet."},
+{id:259,ar:"أَجَل",tr:"ajal",gram:"Zelfstandig nw. (mann.)",trans:"Termijn / tijd",mean:"Vastgestelde termijn, dood",exar:"وَلِكُلِّ أُمَّةٍ أَجَلٌ",exnl:"Voor elke gemeenschap is er een termijn."},
+{id:260,ar:"قَضَاء",tr:"qaḍāʾ",gram:"Zelfstandig nw. (mann.)",trans:"Besluit / lot",mean:"Besluit, lot, oordeel",exar:"وَإِذَا قَضَى أَمْرًا فَإِنَّمَا يَقُولُ لَهُ كُنْ",exnl:"Wanneer Hij een zaak besluit, zegt Hij er slechts: Wees!"},
+{id:261,ar:"قَدَر",tr:"qadar",gram:"Zelfstandig nw. (mann.)",trans:"Voorbeschikking / lot",mean:"Voorbeschikking, maat",exar:"إِنَّا كُلَّ شَيْءٍ خَلَقْنَاهُ بِقَدَرٍ",exnl:"Wij schiepen alles met een maat."},
+{id:262,ar:"مَشِيئَة",tr:"mashīʾa",gram:"Zelfstandig nw. (vr.)",trans:"Wil (van Allah)",mean:"Wil (van Allah)",exar:"وَمَا تَشَاءُونَ إِلَّا أَنْ يَشَاءَ اللَّهُ",exnl:"Jullie willen niets tenzij Allah het wil."},
+{id:263,ar:"أَخَذَ",tr:"akhadha",gram:"Werkwoord (verl. tijd)",trans:"Hij nam",mean:"Hij nam",exar:"وَأَخَذَ بِرَأْسِ أَخِيهِ",exnl:"Hij greep zijn broer bij het hoofd."},
+{id:264,ar:"تَرَكَ",tr:"taraka",gram:"Werkwoord (verl. tijd)",trans:"Hij liet achter",mean:"Hij liet achter / verliet",exar:"وَتَرَكْنَا فِيهَا آيَةً",exnl:"Wij lieten daarin een teken achter."},
+{id:265,ar:"أَكَلَ",tr:"akala",gram:"Werkwoord (verl. tijd)",trans:"Hij at",mean:"Hij at",exar:"كُلُوا مِنْ طَيِّبَاتِ مَا رَزَقْنَاكُمْ",exnl:"Eet van de goede dingen die Wij jullie gaven."},
+{id:266,ar:"قَامَ",tr:"qāma",gram:"Werkwoord (verl. tijd)",trans:"Hij stond op",mean:"Hij stond op",exar:"قُومُوا لِلَّهِ قَانِتِينَ",exnl:"Sta op voor Allah als gehoorzamen."},
+{id:267,ar:"مَاتَ",tr:"māta",gram:"Werkwoord (verl. tijd)",trans:"Hij stierf",mean:"Hij stierf",exar:"وَمَا مُحَمَّدٌ إِلَّا رَسُولٌ",exnl:"Mohammed is slechts een boodschapper."},
+{id:268,ar:"بَكَى",tr:"bakā",gram:"Werkwoord (verl. tijd)",trans:"Hij huilde",mean:"Hij huilde",exar:"وَيَخِرُّونَ لِلْأَذْقَانِ يَبْكُونَ",exnl:"Zij vallen op hun gezichten en huilen."},
+{id:269,ar:"ضَحِكَ",tr:"ḍaḥika",gram:"Werkwoord (verl. tijd)",trans:"Hij lachte",mean:"Hij lachte",exar:"فَضَحِكَتْ فَبَشَّرْنَاهَا",exnl:"Zij lachte, en Wij gaven haar de blijde boodschap."},
+{id:270,ar:"اسْتَعَانَ",tr:"istaʿāna",gram:"Werkwoord (tiende stam)",trans:"Hij zocht hulp",mean:"Hij zocht hulp",exar:"إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",exnl:"U alleen aanbidden wij en U alleen vragen wij om hulp."},
+{id:271,ar:"اسْتَقَامَ",tr:"istaqāma",gram:"Werkwoord (tiende stam)",trans:"Hij bleef recht",mean:"Hij bleef recht / oprecht",exar:"إِنَّ الَّذِينَ قَالُوا رَبُّنَا اللَّهُ ثُمَّ اسْتَقَامُوا",exnl:"Degenen die zeiden onze Heer is Allah en dan recht bleven."},
+{id:272,ar:"أَعْطَى",tr:"aʿṭā",gram:"Werkwoord (verl. tijd, causatief)",trans:"Hij gaf",mean:"Hij gaf",exar:"فَأَمَّا مَنْ أَعْطَى وَاتَّقَى",exnl:"Wie geeft en godvruchtig is."},
+{id:273,ar:"سَافَرَ",tr:"sāfara",gram:"Werkwoord (verl. tijd)",trans:"Hij reisde",mean:"Hij reisde",exar:"وَإِنْ كُنْتُمْ فِي سَفَرٍ",exnl:"En als jullie op reis zijn."},
+{id:274,ar:"ضَرَبَ",tr:"ḍaraba",gram:"Werkwoord (verl. tijd)",trans:"Hij sloeg / gaf voorbeeld",mean:"Hij sloeg / gaf een voorbeeld",exar:"وَيَضْرِبُ اللَّهُ الْأَمْثَالَ لِلنَّاسِ",exnl:"Allah geeft voorbeelden voor de mensen."},
+{id:275,ar:"وَقَعَ",tr:"waqaʿa",gram:"Werkwoord (verl. tijd)",trans:"Het gebeurde / viel",mean:"Hij viel, gebeurde",exar:"إِذَا وَقَعَتِ الْوَاقِعَةُ",exnl:"Wanneer de Gebeurtenis plaatsvindt."},
+{id:276,ar:"قَرَّبَ",tr:"qarraba",gram:"Werkwoord (causatief)",trans:"Hij naderde / offerde",mean:"Hij naderde / offerde",exar:"وَمَا يَتَقَرَّبُ إِلَيَّ عَبْدِي بِشَيْءٍ أَحَبَّ إِلَيَّ",exnl:"Mijn dienaar nadert Mij niet met iets dat Mij liever is."},
+{id:277,ar:"شَرِبَ",tr:"shariba",gram:"Werkwoord (verl. tijd)",trans:"Hij dronk",mean:"Hij dronk",exar:"يَشْرَبُ بِهَا عِبَادُ اللَّهِ",exnl:"Allahs dienaren drinken ervan."},
+{id:278,ar:"نَامَ",tr:"nāma",gram:"Werkwoord (verl. tijd)",trans:"Hij sliep",mean:"Hij sliep",exar:"لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ",exnl:"Geen sluimering noch slaap overvalt Hem."},
+{id:279,ar:"بَشَارَة",tr:"bishāra",gram:"Zelfstandig nw. (vr.)",trans:"Blijde boodschap",mean:"Blijde boodschap",exar:"لَهُمُ الْبُشْرَى فِي الْحَيَاةِ الدُّنْيَا",exnl:"Zij hebben de blijde boodschap in het aardse leven."},
+{id:280,ar:"أَمْس",tr:"ams",gram:"Bijwoord",trans:"Gisteren",mean:"Gisteren",exar:"كَأَنْ لَمْ تَغْنَ بِالْأَمْسِ",exnl:"Alsof zij gisteren niet bestonden."},
+{id:281,ar:"اليَوْم",tr:"al-yawm",gram:"Bijwoord",trans:"Vandaag",mean:"Vandaag",exar:"الْيَوْمَ أَكْمَلْتُ لَكُمْ دِينَكُمْ",exnl:"Vandaag heb Ik jullie godsdienst voltooid."},
+{id:282,ar:"شَكُور",tr:"shakūr",gram:"Bijv. nw. (intensief)",trans:"Dankbaar (intensief)",mean:"Zeer dankbaar",exar:"إِنَّهُ كَانَ عَبْدًا شَكُورًا",exnl:"Hij was waarlijk een dankbare dienaar."},
+{id:283,ar:"صَبُور",tr:"ṣabūr",gram:"Bijv. nw. (intensief)",trans:"Geduldig (intensief)",mean:"Zeer geduldig",exar:"نِعْمَ الْعَبْدُ إِنَّهُ أَوَّابٌ",exnl:"Wat een goede dienaar – hij was berouwvol."},
+{id:284,ar:"عَامِل",tr:"ʿāmil",gram:"Actief deelwoord",trans:"Werkende / handelende",mean:"Werkende, handelende (persoon)",exar:"وَقُلِ اعْمَلُوا فَسَيَرَى اللَّهُ عَمَلَكُمْ",exnl:"Zeg: Werk, want Allah zal jullie werk zien."},
+{id:285,ar:"قَادِر",tr:"qādir",gram:"Actief deelwoord",trans:"In staat / machtig",mean:"In staat, machtig",exar:"وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",exnl:"En Hij heeft macht over alles."},
+{id:286,ar:"صَابِر",tr:"ṣābir",gram:"Actief deelwoord",trans:"Geduldig (persoon)",mean:"Iemand die geduldig is",exar:"إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",exnl:"Allah is met de geduldigen."},
+{id:287,ar:"شَاكِر",tr:"shākir",gram:"Actief deelwoord",trans:"Dankbaar (persoon)",mean:"Iemand die dankbaar is",exar:"وَمَنْ شَكَرَ فَإِنَّمَا يَشْكُرُ لِنَفْسِهِ",exnl:"Wie dankbaar is, is dat voor zichzelf."},
+{id:288,ar:"خَاشِع",tr:"khāshiʿ",gram:"Actief deelwoord",trans:"Ootmoedig / deemoedig",mean:"Ootmoedig, deemoedig",exar:"قَدْ أَفْلَحَ الْمُؤْمِنُونَ الَّذِينَ هُمْ فِي صَلَاتِهِمْ خَاشِعُونَ",exnl:"De gelovigen slagen die in hun gebed ootmoedig zijn."},
+{id:289,ar:"تَائِب",tr:"tāʾib",gram:"Actief deelwoord",trans:"Berouwhebbend",mean:"Iemand die berouw heeft",exar:"إِنَّ اللَّهَ يُحِبُّ التَّوَّابِينَ",exnl:"Allah houdt van degenen die berouw tonen."},
+{id:290,ar:"مُحْسِن",tr:"muḥsin",gram:"Actief deelwoord",trans:"Weldoener",mean:"Iemand die goed doet",exar:"إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ",exnl:"Allah houdt van de weldoeners."},
+{id:291,ar:"مُخْلِص",tr:"mukhlṣ",gram:"Actief deelwoord",trans:"Oprecht / toegewijd",mean:"Oprecht, toegewijd",exar:"إِلَّا عِبَادَ اللَّهِ الْمُخْلَصِينَ",exnl:"Behalve Allahs toegewijde dienaren."},
+{id:292,ar:"مُجَاهِد",tr:"mujāhid",gram:"Actief deelwoord",trans:"Strijdende (persoon)",mean:"Iemand die strijdt voor Allah",exar:"وَجَاهِدُوا فِي اللَّهِ حَقَّ جِهَادِهِ",exnl:"En strijd voor Allah zoals het hoort."},
+{id:293,ar:"مُتَوَكِّل",tr:"mutawakkil",gram:"Actief deelwoord",trans:"Vertrouwend op Allah",mean:"Iemand die op Allah vertrouwt",exar:"وَعَلَى اللَّهِ فَلْيَتَوَكَّلِ الْمُؤْمِنُونَ",exnl:"En op Allah mogen de gelovigen vertrouwen."},
+{id:294,ar:"مُتَّقِين",tr:"muttaqīn",gram:"Zelfstandig nw. (mv.)",trans:"De godvruchtigen",mean:"Godvruchtigen (meervoud)",exar:"إِنَّ اللَّهَ يُحِبُّ الْمُتَّقِينَ",exnl:"Allah houdt van de godvruchtigen."},
+{id:295,ar:"مُؤْمِنِين",tr:"muʾminīn",gram:"Zelfstandig nw. (mv.)",trans:"De gelovigen",mean:"Gelovigen (meervoud)",exar:"إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ",exnl:"De gelovigen zijn slechts broeders."},
+{id:296,ar:"مُسْلِمِين",tr:"muslimīn",gram:"Zelfstandig nw. (mv.)",trans:"De moslims",mean:"Moslims (meervoud)",exar:"وَأَنَا أَوَّلُ الْمُسْلِمِينَ",exnl:"En ik ben de eerste der moslims."},
+{id:297,ar:"صَالِحِين",tr:"ṣāliḥīn",gram:"Zelfstandig nw. (mv.)",trans:"De rechtschapenen",mean:"Rechtschapenen (meervoud)",exar:"إِنَّ الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ",exnl:"Degenen die geloven en goede daden verrichten."},
+{id:298,ar:"كَافِرِين",tr:"kāfirīn",gram:"Zelfstandig nw. (mv.)",trans:"De ongelovigen",mean:"Ongelovigen (meervoud)",exar:"وَاتَّقُوا النَّارَ الَّتِي أُعِدَّتْ لِلْكَافِرِينَ",exnl:"Vrees het Vuur, bereid voor de ongelovigen."},
+{id:299,ar:"ظَالِمِين",tr:"ẓālimīn",gram:"Zelfstandig nw. (mv.)",trans:"De onrechtplegers",mean:"Onrechtplegers (meervoud)",exar:"وَاللَّهُ لَا يُحِبُّ الظَّالِمِينَ",exnl:"Allah houdt niet van onrechtplegers."},
+{id:300,ar:"فَاسِقِين",tr:"fāsiqīn",gram:"Zelfstandig nw. (mv.)",trans:"De zondaars",mean:"Zondaars, ongehoorzamen (meervoud)",exar:"وَاللَّهُ لَا يَهْدِي الْقَوْمَ الْفَاسِقِينَ",exnl:"Allah leidt het zondige volk niet."},
+];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function App() {
+  const [mode, setMode] = useState("flashcard");
+  const [learned, setLearned] = useState({});
+  const [starred, setStarred] = useState({});
+
+  const learnedCount = Object.values(learned).filter(Boolean).length;
+  const starredCount = Object.values(starred).filter(Boolean).length;
+  const pct = Math.round((learnedCount / WORDS.length) * 100);
+
+  const toggleLearned = (id) => setLearned(p => ({ ...p, [id]: !p[id] }));
+  const toggleStarred = (id) => setStarred(p => ({ ...p, [id]: !p[id] }));
+
+  return (
+    <div style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", background: "#f0ece4", minHeight: "100vh", paddingBottom: 40 }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #f0ece4; }
+        .arabic { font-family: 'Noto Sans Arabic', 'Amiri', serif !important; direction: rtl; }
+        .card-flip { transition: transform 0.55s cubic-bezier(.4,0,.2,1); transform-style: preserve-3d; }
+        .card-flip.flipped { transform: rotateY(180deg); }
+        .card-face { backface-visibility: hidden; position: absolute; inset: 0; }
+        .card-back { transform: rotateY(180deg); }
+        .word-row:hover { background: #ede9df !important; }
+        .opt-btn { transition: all 0.15s; cursor: pointer; }
+        .opt-btn:hover:not(.answered) { background: #e8e0d0 !important; border-color: #b5a882 !important; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #c8b98a; border-radius: 10px; }
+      `}</style>
+
+      <div style={{ background: "linear-gradient(135deg, #2c1a0e 0%, #4a2c0a 50%, #2c1a0e 100%)", padding: "24px 20px 20px", color: "#f0ece4" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+            <div style={{ width: 42, height: 42, background: "linear-gradient(135deg, #c9a84c, #e8c97a)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>☽</div>
+            <div>
+              <div style={{ fontFamily: "'Lora', serif", fontSize: 20, fontWeight: 700 }}>Top 300 Koranwoorden</div>
+              <div style={{ fontSize: 12, color: "#c9a84c", marginTop: 1 }}>Arabisch woordenschat · Flashcards & Quiz</div>
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, marginBottom: 16 }}>
+            {[[WORDS.length,"Woorden","#e8c97a"],[learnedCount,"Geleerd","#4ade80"],[starredCount,"Sterren","#fbbf24"],[`${pct}%`,"Voortgang","#c9a84c"]].map(([val,label,color],i) => (
+              <div key={i} style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 8px", textAlign: "center" }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color }}>{val}</div>
+                <div style={{ fontSize: 10, color: "#c9a84c99", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 2 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: 4, height: 5, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#c9a84c,#e8c97a)", borderRadius: 4, transition: "width 0.5s ease" }} />
+          </div>
+        </div>
+      </div>
+
+      <div style={{ background: "#fff8f0", borderBottom: "2px solid #e8dcc8", position: "sticky", top: 0, zIndex: 50 }}>
+        <div style={{ maxWidth: 720, margin: "0 auto", display: "flex" }}>
+          {[["🃏","Flashcard","flashcard"],["🎯","Quiz","quiz"],["📖","Bladeren","browse"]].map(([icon,label,id]) => (
+            <button key={id} onClick={() => setMode(id)} style={{
+              flex: 1, padding: "13px 8px", border: "none", background: "transparent", cursor: "pointer",
+              fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 600,
+              color: mode === id ? "#4a2c0a" : "#9b8a6e",
+              borderBottom: mode === id ? "2.5px solid #c9a84c" : "2.5px solid transparent",
+              transition: "all 0.18s", display: "flex", flexDirection: "column", alignItems: "center", gap: 2
+            }}>
+              <span style={{ fontSize: 18 }}>{icon}</span>{label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 16px" }}>
+        {mode === "flashcard" && <FlashcardMode words={WORDS} learned={learned} starred={starred} onToggleLearned={toggleLearned} onToggleStarred={toggleStarred} />}
+        {mode === "quiz" && <QuizMode words={WORDS} />}
+        {mode === "browse" && <BrowseMode words={WORDS} learned={learned} starred={starred} onToggleLearned={toggleLearned} onToggleStarred={toggleStarred} />}
+      </div>
+    </div>
+  );
+}
+
+function FlashcardMode({ words, learned, starred, onToggleLearned, onToggleStarred }) {
+  const [filter, setFilter] = useState("all");
+  const [idx, setIdx] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [deck, setDeck] = useState(words);
+
+  useEffect(() => {
+    let d = filter === "starred" ? words.filter(w => starred[w.id])
+           : filter === "unlearned" ? words.filter(w => !learned[w.id])
+           : words;
+    if (!d.length) d = words;
+    setDeck(shuffle(d));
+    setIdx(0);
+    setFlipped(false);
+  }, [filter]);
+
+  const word = deck[Math.min(idx, deck.length-1)];
+  if (!word) return null;
+
+  const go = (dir) => {
+    setFlipped(false);
+    setTimeout(() => setIdx(i => (i + dir + deck.length) % deck.length), 50);
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
+        {[["all","Alle 300"],["unlearned","Te leren"],["starred","Gemarkeerd ⭐"]].map(([f,label]) => (
+          <button key={f} onClick={() => setFilter(f)} style={{
+            padding: "6px 14px", borderRadius: 20, border: "1.5px solid", cursor: "pointer",
+            fontFamily: "'DM Sans', sans-serif", fontSize: 12.5, fontWeight: 500, transition: "all 0.15s",
+            background: filter === f ? "#4a2c0a" : "transparent",
+            borderColor: filter === f ? "#4a2c0a" : "#c8b98a",
+            color: filter === f ? "#f0ece4" : "#7a6040"
+          }}>{label}</button>
+        ))}
+        <div style={{ marginLeft: "auto", fontSize: 13, color: "#9b8a6e", fontFamily: "'DM Sans', sans-serif" }}>{idx + 1} / {deck.length}</div>
+      </div>
+
+      <div style={{ perspective: 1200, marginBottom: 16 }} onClick={() => setFlipped(f => !f)}>
+        <div className={`card-flip${flipped ? " flipped" : ""}`} style={{ position: "relative", height: 340, borderRadius: 20, cursor: "pointer" }}>
+          <div className="card-face" style={{
+            background: "linear-gradient(145deg,#fffdf7,#faf5e8)", border: "1.5px solid #e8dcc8", borderRadius: 20,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            padding: 32, textAlign: "center", boxShadow: "0 8px 32px rgba(74,44,10,0.12)"
+          }}>
+            <div style={{ fontSize: 11, color: "#b5a882", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 20, fontFamily: "'DM Sans', sans-serif" }}>{word.gram}</div>
+            <div className="arabic" style={{ fontSize: "clamp(3.5rem,12vw,5.5rem)", color: "#2c1a0e", lineHeight: 1.3, marginBottom: 12 }}>{word.ar}</div>
+            <div style={{ fontSize: 14, color: "#9b8a6e", fontStyle: "italic", fontFamily: "'Lora', serif" }}>{word.tr}</div>
+            <div style={{ marginTop: 28, fontSize: 12, color: "#c8b98a", fontFamily: "'DM Sans', sans-serif" }}>Tik om te onthullen ↕</div>
+            <button onClick={e => { e.stopPropagation(); onToggleStarred(word.id); }} style={{
+              position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", fontSize: 20,
+              color: starred[word.id] ? "#f59e0b" : "#d4c4a0"
+            }}>{starred[word.id] ? "⭐" : "☆"}</button>
+          </div>
+          <div className="card-face card-back" style={{
+            background: "linear-gradient(145deg,#2c1a0e,#3d2510)", border: "1.5px solid #6b4820", borderRadius: 20,
+            padding: "24px 28px", boxShadow: "0 8px 32px rgba(74,44,10,0.25)", overflowY: "auto"
+          }}>
+            <div style={{ marginBottom: 16 }}>
+              <div className="arabic" style={{ fontSize: "clamp(2rem,6vw,3rem)", color: "#e8c97a", lineHeight: 1.3, textAlign: "right", marginBottom: 4 }}>{word.ar}</div>
+              <div style={{ fontSize: 12, color: "#c9a84c88", fontStyle: "italic", textAlign: "right", fontFamily: "'Lora', serif" }}>{word.tr}</div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+              <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 12px" }}>
+                <div style={{ fontSize: 10, color: "#c9a84c88", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4, fontFamily: "'DM Sans', sans-serif" }}>Vertaling</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: "#e8c97a", fontFamily: "'Lora', serif" }}>{word.trans}</div>
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 12px" }}>
+                <div style={{ fontSize: 10, color: "#c9a84c88", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4, fontFamily: "'DM Sans', sans-serif" }}>Betekenis</div>
+                <div style={{ fontSize: 12, color: "#c9a84c", fontFamily: "'DM Sans', sans-serif" }}>{word.mean}</div>
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: "12px 14px" }}>
+              <div style={{ fontSize: 10, color: "#c9a84c88", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>Voorbeeld</div>
+              <div className="arabic" style={{ fontSize: "1.1rem", color: "#2dd4bf", lineHeight: 1.9, textAlign: "right", marginBottom: 4 }}>{word.exar}</div>
+              <div style={{ fontSize: 12, color: "#a09070", fontStyle: "italic", fontFamily: "'Lora', serif" }}>{word.exnl}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 10 }}>
+        <button onClick={() => go(-1)} style={{ flex: 1, padding: "12px 8px", border: "1.5px solid #e8dcc8", background: "#fff8f0", borderRadius: 12, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "#7a6040", fontWeight: 500 }}>← Vorige</button>
+        <button onClick={() => onToggleLearned(word.id)} style={{
+          flex: 1.5, padding: "12px 8px", border: "1.5px solid",
+          background: learned[word.id] ? "rgba(74,222,128,0.12)" : "rgba(201,168,76,0.1)",
+          borderColor: learned[word.id] ? "#4ade80" : "#c9a84c",
+          color: learned[word.id] ? "#16a34a" : "#92712a",
+          borderRadius: 12, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 600, transition: "all 0.2s"
+        }}>{learned[word.id] ? "✓ Gekend!" : "Markeer als geleerd"}</button>
+        <button onClick={() => go(1)} style={{ flex: 1, padding: "12px 8px", border: "1.5px solid #e8dcc8", background: "#fff8f0", borderRadius: 12, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "#7a6040", fontWeight: 500 }}>Volgende →</button>
+      </div>
+    </div>
+  );
+}
+
+function QuizMode({ words }) {
+  const [deck, setDeck] = useState(() => shuffle(words));
+  const [qi, setQi] = useState(0);
+  const [chosen, setChosen] = useState(null);
+  const [score, setScore] = useState(0);
+  const [done, setDone] = useState(false);
+  const [wrong, setWrong] = useState([]);
+  const MAX = 20;
+  const q = deck[qi];
+
+  const getOpts = useCallback((word) => shuffle([word, ...shuffle(words.filter(w => w.id !== word.id)).slice(0, 3)]), [words]);
+  const [opts, setOpts] = useState(() => getOpts(deck[0]));
+
+  const reset = () => {
+    const d = shuffle(words);
+    setDeck(d); setQi(0); setChosen(null); setScore(0); setDone(false); setWrong([]);
+    setOpts(getOpts(d[0]));
+  };
+
+  const pick = (opt) => {
+    if (chosen) return;
+    setChosen(opt.id);
+    if (opt.id === q.id) setScore(s => s + 1);
+    else setWrong(w => [...w, q]);
+  };
+
+  const next = () => {
+    if (qi + 1 >= MAX) { setDone(true); return; }
+    const ni = qi + 1;
+    setQi(ni); setChosen(null); setOpts(getOpts(deck[ni]));
+  };
+
+  if (done) return (
+    <div>
+      <div style={{ background: "linear-gradient(135deg,#2c1a0e,#3d2510)", borderRadius: 24, padding: "40px 24px", marginBottom: 20, textAlign: "center", boxShadow: "0 12px 40px rgba(74,44,10,0.2)" }}>
+        <div style={{ fontSize: 56, marginBottom: 12 }}>{score >= 16 ? "🏆" : score >= 12 ? "⭐" : "📖"}</div>
+        <div style={{ fontFamily: "'Lora', serif", fontSize: 28, fontWeight: 700, color: "#e8c97a", marginBottom: 6 }}>{score} / {MAX}</div>
+        <div style={{ fontSize: 14, color: "#c9a84c88", marginBottom: 24, fontFamily: "'DM Sans', sans-serif" }}>
+          {score >= 16 ? "Uitstekend! ماشاءالله" : score >= 12 ? "Goed gedaan! Blijf oefenen." : "Blijf oefenen, je kunt het!"}
+        </div>
+        <button onClick={reset} style={{ padding: "13px 32px", background: "linear-gradient(135deg,#c9a84c,#e8c97a)", border: "none", borderRadius: 12, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 14, color: "#2c1a0e" }}>Nieuwe quiz →</button>
+      </div>
+      {wrong.length > 0 && (
+        <div style={{ background: "#fff8f0", border: "1.5px solid #e8dcc8", borderRadius: 16, padding: 20 }}>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 600, color: "#7a6040", marginBottom: 12 }}>Fout gegaan ({wrong.length}):</div>
+          {wrong.map(w => (
+            <div key={w.id} style={{ display: "flex", gap: 12, padding: "8px 0", borderBottom: "1px solid #e8dcc8", alignItems: "center" }}>
+              <span className="arabic" style={{ fontSize: 22, color: "#4a2c0a", minWidth: 60, textAlign: "right" }}>{w.ar}</span>
+              <span style={{ fontSize: 13, color: "#9b8a6e", fontStyle: "italic", fontFamily: "'Lora', serif" }}>{w.tr}</span>
+              <span style={{ marginLeft: "auto", fontSize: 13, color: "#4a2c0a", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>{w.trans}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#9b8a6e" }}>
+        <span>Vraag {qi + 1} van {MAX}</span>
+        <span style={{ color: "#16a34a", fontWeight: 600 }}>✓ {score}</span>
+      </div>
+      <div style={{ background: "#e8dcc8", borderRadius: 4, height: 5, marginBottom: 24, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: `${((qi+1)/MAX)*100}%`, background: "linear-gradient(90deg,#c9a84c,#e8c97a)", borderRadius: 4, transition: "width 0.3s" }} />
+      </div>
+      <div style={{ background: "linear-gradient(145deg,#2c1a0e,#3d2510)", borderRadius: 20, padding: "36px 24px", textAlign: "center", marginBottom: 18, boxShadow: "0 8px 32px rgba(74,44,10,0.18)" }}>
+        <div style={{ fontSize: 11, color: "#c9a84c88", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 16, fontFamily: "'DM Sans', sans-serif" }}>Wat betekent dit woord?</div>
+        <div className="arabic" style={{ fontSize: "clamp(3rem,10vw,5rem)", color: "#e8c97a", lineHeight: 1.3, marginBottom: 8 }}>{q.ar}</div>
+        <div style={{ fontSize: 14, color: "#c9a84c88", fontStyle: "italic", fontFamily: "'Lora', serif" }}>{q.tr}</div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+        {opts.map(opt => {
+          let bg="#fff8f0", border="#e8dcc8", color="#4a2c0a";
+          if (chosen) {
+            if (opt.id === q.id) { bg="rgba(74,222,128,0.12)"; border="#4ade80"; color="#16a34a"; }
+            else if (opt.id === chosen) { bg="rgba(248,113,113,0.12)"; border="#f87171"; color="#dc2626"; }
+          }
+          return (
+            <button key={opt.id} className={`opt-btn${chosen?" answered":""}`} onClick={() => pick(opt)} style={{
+              padding:"14px 12px", background:bg, border:`1.5px solid ${border}`, borderRadius:12,
+              cursor:chosen?"default":"pointer", fontFamily:"'DM Sans',sans-serif", fontSize:13, color, fontWeight:500,
+              textAlign:"left", lineHeight:1.4, transition:"all 0.15s"
+            }}>
+              {opt.trans}
+              {chosen && opt.id===q.id && <span style={{float:"right"}}>✓</span>}
+              {chosen && opt.id===chosen && opt.id!==q.id && <span style={{float:"right"}}>✗</span>}
+            </button>
+          );
+        })}
+      </div>
+      {chosen && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ background: chosen===q.id?"rgba(74,222,128,0.1)":"rgba(248,113,113,0.1)", border:`1.5px solid ${chosen===q.id?"#4ade80":"#f87171"}`, borderRadius:12, padding:"12px 16px", marginBottom:10 }}>
+            <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:13, color:chosen===q.id?"#16a34a":"#dc2626", fontWeight:600 }}>
+              {chosen===q.id ? "✓ Correct!" : `✗ Antwoord: "${q.trans}"`}
+            </div>
+            <div style={{ fontSize:12, color:"#9b8a6e", marginTop:4, fontFamily:"'Lora',serif", fontStyle:"italic" }}>{q.mean}</div>
+          </div>
+          <div style={{ background:"#f5f0e8", borderRadius:12, padding:"12px 16px", border:"1px solid #e8dcc8" }}>
+            <div className="arabic" style={{ fontSize:16, color:"#2c1a0e", marginBottom:4, textAlign:"right" }}>{q.exar}</div>
+            <div style={{ fontSize:12, color:"#9b8a6e", fontStyle:"italic", fontFamily:"'Lora',serif" }}>{q.exnl}</div>
+          </div>
+        </div>
+      )}
+      <div style={{ display:"flex", gap:10 }}>
+        {chosen && <button onClick={next} style={{ flex:1, padding:"13px", background:"linear-gradient(135deg,#4a2c0a,#6b4820)", border:"none", borderRadius:12, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", fontWeight:600, fontSize:14, color:"#e8c97a" }}>{qi+1>=MAX?"Resultaten →":"Volgende →"}</button>}
+        <button onClick={reset} style={{ padding:"13px 16px", border:"1.5px solid #e8dcc8", background:"#fff8f0", borderRadius:12, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", fontSize:13, color:"#9b8a6e" }}>🔀</button>
+      </div>
+    </div>
+  );
+}
+
+function BrowseMode({ words, learned, starred, onToggleLearned, onToggleStarred }) {
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [catFilter, setCatFilter] = useState("all");
+
+  const CATS = [
+    {id:"all",label:"Alles"},
+    {id:"vnw",label:"Voornaamwoorden"},
+    {id:"vz",label:"Voorzetsels"},
+    {id:"vgw",label:"Voegwoorden"},
+    {id:"naam",label:"Namen van Allah"},
+    {id:"zn",label:"Zelfst. nw."},
+    {id:"ww",label:"Werkwoorden"},
+    {id:"bjv",label:"Bijv. nw."},
+  ];
+
+  const catMatch = (w) => {
+    if (catFilter === "all") return true;
+    const g = w.gram.toLowerCase();
+    if (catFilter === "vnw") return g.includes("voornaamwoord");
+    if (catFilter === "vz") return g.includes("voorzetsel");
+    if (catFilter === "vgw") return g.includes("voegwoord") || g.includes("deeltje");
+    if (catFilter === "naam") return g.includes("eigennaam") || w.id >= 36 && w.id <= 50;
+    if (catFilter === "zn") return g.includes("zelfstandig");
+    if (catFilter === "ww") return g.includes("werkwoord");
+    if (catFilter === "bjv") return g.includes("bijvoeglijk") || g.includes("deelwoord");
+    return true;
+  };
+
+  const filtered = words.filter(w => {
+    const q = search.toLowerCase();
+    const matchText = w.ar.includes(q) || w.tr.toLowerCase().includes(q) || w.trans.toLowerCase().includes(q) || w.mean.toLowerCase().includes(q);
+    return matchText && catMatch(w);
+  });
+
+  return (
+    <div>
+      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Zoek op Arabisch, transliteratie of vertaling…"
+        style={{ width:"100%", padding:"12px 16px", background:"#fff8f0", border:"1.5px solid #e8dcc8", borderRadius:12, fontFamily:"'DM Sans',sans-serif", fontSize:14, color:"#4a2c0a", outline:"none", marginBottom:12 }} />
+      <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:16 }}>
+        {CATS.map(c => (
+          <button key={c.id} onClick={() => setCatFilter(c.id)} style={{
+            padding:"5px 12px", borderRadius:16, border:"1.5px solid", cursor:"pointer",
+            fontFamily:"'DM Sans',sans-serif", fontSize:11.5, fontWeight:500,
+            background: catFilter===c.id?"#4a2c0a":"transparent",
+            borderColor: catFilter===c.id?"#4a2c0a":"#c8b98a",
+            color: catFilter===c.id?"#f0ece4":"#7a6040"
+          }}>{c.label}</button>
+        ))}
+        <span style={{ marginLeft:"auto", alignSelf:"center", fontSize:12, color:"#9b8a6e", fontFamily:"'DM Sans',sans-serif" }}>{filtered.length} woorden</span>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:6, maxHeight:"60vh", overflowY:"auto", paddingRight:4 }}>
+        {filtered.map(w => (
+          <div key={w.id} className="word-row" onClick={() => setSelected(selected?.id===w.id?null:w)} style={{
+            background: selected?.id===w.id?"#ede9df":"#fff8f0",
+            border:`1.5px solid ${selected?.id===w.id?"#c9a84c":"#e8dcc8"}`,
+            borderRadius:12, padding:"12px 14px", cursor:"pointer", transition:"all 0.15s"
+          }}>
+            <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+              <span style={{ fontSize:11, color:"#b5a882", minWidth:28, fontFamily:"'DM Sans',sans-serif" }}>#{w.id}</span>
+              <span className="arabic" style={{ fontSize:22, color:"#2c1a0e", minWidth:70, textAlign:"right" }}>{w.ar}</span>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:13, color:"#4a2c0a", fontWeight:500, fontFamily:"'DM Sans',sans-serif" }}>{w.trans}</div>
+                <div style={{ fontSize:11.5, color:"#9b8a6e", fontStyle:"italic", fontFamily:"'Lora',serif" }}>{w.tr}</div>
+              </div>
+              <div style={{ display:"flex", gap:6, flexShrink:0 }}>
+                <button onClick={e=>{e.stopPropagation();onToggleStarred(w.id);}} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, color:starred[w.id]?"#f59e0b":"#d4c4a0" }}>{starred[w.id]?"⭐":"☆"}</button>
+                <button onClick={e=>{e.stopPropagation();onToggleLearned(w.id);}} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, color:learned[w.id]?"#4ade80":"#d4c4a0" }}>{learned[w.id]?"✓":"○"}</button>
+              </div>
+            </div>
+            {selected?.id===w.id && (
+              <div style={{ marginTop:14, paddingTop:14, borderTop:"1px solid #e8dcc8" }}>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:10 }}>
+                  <div style={{ background:"#f5f0e8", borderRadius:8, padding:"8px 10px" }}>
+                    <div style={{ fontSize:9.5, color:"#b5a882", textTransform:"uppercase", letterSpacing:"0.08em", fontFamily:"'DM Sans',sans-serif", marginBottom:2 }}>Betekenis</div>
+                    <div style={{ fontSize:12.5, color:"#4a2c0a", fontFamily:"'DM Sans',sans-serif" }}>{w.mean}</div>
+                  </div>
+                  <div style={{ background:"#f5f0e8", borderRadius:8, padding:"8px 10px" }}>
+                    <div style={{ fontSize:9.5, color:"#b5a882", textTransform:"uppercase", letterSpacing:"0.08em", fontFamily:"'DM Sans',sans-serif", marginBottom:2 }}>Grammatica</div>
+                    <div style={{ fontSize:12, color:"#7a6040", fontFamily:"'DM Sans',sans-serif" }}>{w.gram}</div>
+                  </div>
+                </div>
+                <div style={{ background:"#f5f0e8", borderRadius:8, padding:"10px 12px" }}>
+                  <div className="arabic" style={{ fontSize:15, color:"#2c1a0e", textAlign:"right", marginBottom:4, lineHeight:1.9 }}>{w.exar}</div>
+                  <div style={{ fontSize:12, color:"#9b8a6e", fontStyle:"italic", fontFamily:"'Lora',serif" }}>{w.exnl}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
